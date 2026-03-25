@@ -29,4 +29,4 @@ echo "Running database migrations..."
 dotnet /migrator/FullStackProject.Migrator.dll -q
 
 echo "Starting application..."
-exec dotnet /app/FullStackProject.Web.Host.dll
+cd /app && exec dotnet FullStackProject.Web.Host.dll
