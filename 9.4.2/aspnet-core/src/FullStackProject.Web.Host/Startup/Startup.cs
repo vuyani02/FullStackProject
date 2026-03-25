@@ -55,7 +55,7 @@ namespace FullStackProject.Web.Host.Startup
                     builder => builder
                         .WithOrigins(
                             // App:CorsOrigins in appsettings.json can contain more than one address separated by comma.
-                            _appConfiguration["App:CorsOrigins"]
+                            (_appConfiguration["App:CorsOrigins"] ?? "")
                                 .Split(",", StringSplitOptions.RemoveEmptyEntries)
                                 .Select(o => o.RemovePostFix("/"))
                                 .ToArray()
