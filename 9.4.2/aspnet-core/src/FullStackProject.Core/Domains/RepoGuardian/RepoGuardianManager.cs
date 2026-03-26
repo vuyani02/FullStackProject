@@ -111,6 +111,14 @@ namespace FullStackProject.Domains.RepoGuardian
                 scores.Add(complianceScore);
             }
 
+            var overallScore = scores.Any()
+                ? (int)Math.Round(scores.Average(s => s.Score))
+                : 0;
+
+            var scanRun = await _scanRunRepo.GetAsync(scanRunId);
+            scanRun.OverallScore = overallScore;
+            await _scanRunRepo.UpdateAsync(scanRun);
+
             return scores;
         }
 

@@ -20,5 +20,7 @@ namespace FullStackProject.Domains.RepoGuardian
 
         [MaxLength(1000)]
         public string ErrorMessage { get; set; }
+
+        public int? OverallScore { get; set; }
     }
 }
