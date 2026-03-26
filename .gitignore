@@ -18,6 +18,7 @@ launchSettings.json
 # ASP.NET
 appsettings.Production.json
 appsettings.Staging.json
+appsettings.Development.json
 
 # Entity Framework
 Migrations/*.Designer.cs
