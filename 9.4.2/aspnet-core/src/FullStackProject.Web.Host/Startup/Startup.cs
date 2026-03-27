@@ -48,6 +48,14 @@ namespace FullStackProject.Web.Host.Startup
 
             services.AddSignalR();
 
+            // GitHub API client — base URL and required headers set once here
+            services.AddHttpClient("GitHub", client =>
+            {
+                client.BaseAddress = new Uri(_appConfiguration["GitHub:ApiBaseUrl"]);
+                client.DefaultRequestHeaders.Add("User-Agent", "RepoGuardian");
+                client.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
+            });
+
             // Configure CORS for angular2 UI
             services.AddCors(
                 options => options.AddPolicy(
