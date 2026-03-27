@@ -71,6 +71,9 @@ namespace FullStackProject.RepoGuardian.Rules
 
                 Check(scanRunId, "SEC_002", "No .env files committed", RuleCategory.Security,
                     !paths.Any(p => p == ".env" || p.EndsWith("/.env") || p.Contains("/.env."))),
+
+                Check(scanRunId, "SEC_003", "Security policy or CODEOWNERS exists", RuleCategory.Security,
+                    paths.Any(p => p.Contains("security.md") || p.Contains("codeowners"))),
             };
         }
 
