@@ -32,6 +32,15 @@ namespace FullStackProject.RepoGuardian.Rules
                 Check(scanRunId, "DOC_002", "LICENSE exists", RuleCategory.Documentation,
                     paths.Any(p => p == "license" || p == "license.md" || p == "license.txt"
                                    || p.EndsWith("/license") || p.EndsWith("/license.md") || p.EndsWith("/license.txt"))),
+
+                Check(scanRunId, "DOC_003", "CONTRIBUTING guide exists", RuleCategory.Documentation,
+                    paths.Any(p => p.Contains("contributing"))),
+
+                // ── Testing ───────────────────────────────────────────────────
+                Check(scanRunId, "TEST_001", "Test files or test directory exists", RuleCategory.Testing,
+                    paths.Any(p => p.Contains("/test/") || p.Contains("/tests/") || p.Contains("/__tests__/")
+                                   || p.Contains(".test.") || p.Contains(".spec.")
+                                   || p.StartsWith("test/") || p.StartsWith("tests/"))),
             };
         }
 
