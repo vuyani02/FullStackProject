@@ -56,6 +56,13 @@ namespace FullStackProject.RepoGuardian.Rules
                                    || p.Contains(".editorconfig") || p.Contains("stylecop")
                                    || p.Contains(".flake8") || p.Contains("prettierrc")
                                    || p.Contains(".stylelintrc"))),
+
+                // ── Dependencies ──────────────────────────────────────────────
+                Check(scanRunId, "DEP_001", "Dependency lock file exists", RuleCategory.Dependencies,
+                    paths.Any(p => p == "package-lock.json" || p == "yarn.lock"
+                                   || p == "pipfile.lock" || p == "poetry.lock"
+                                   || p == "gemfile.lock" || p == "packages.lock.json"
+                                   || p == "composer.lock")),
             };
         }
 
