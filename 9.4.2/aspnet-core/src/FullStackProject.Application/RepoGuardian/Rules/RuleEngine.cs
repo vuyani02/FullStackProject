@@ -63,6 +63,10 @@ namespace FullStackProject.RepoGuardian.Rules
                                    || p == "pipfile.lock" || p == "poetry.lock"
                                    || p == "gemfile.lock" || p == "packages.lock.json"
                                    || p == "composer.lock")),
+
+                // ── Security ──────────────────────────────────────────────────
+                Check(scanRunId, "SEC_001", ".gitignore exists", RuleCategory.Security,
+                    paths.Any(p => p == ".gitignore" || p.EndsWith("/.gitignore"))),
             };
         }
 
