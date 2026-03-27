@@ -20,6 +20,7 @@ namespace FullStackProject.RepoGuardian.Rules
         /// </summary>
         public List<RuleResult> Evaluate(Guid scanRunId, List<string> filePaths)
         {
+            Logger.Debug($"RuleEngine: evaluating {filePaths.Count} paths for scan {scanRunId}");
             var paths = filePaths.Select(p => p.ToLowerInvariant()).ToList();
 
             return new List<RuleResult>
@@ -67,6 +68,9 @@ namespace FullStackProject.RepoGuardian.Rules
                 // ── Security ──────────────────────────────────────────────────
                 Check(scanRunId, "SEC_001", ".gitignore exists", RuleCategory.Security,
                     paths.Any(p => p == ".gitignore" || p.EndsWith("/.gitignore"))),
+
+                Check(scanRunId, "SEC_002", "No .env files committed", RuleCategory.Security,
+                    !paths.Any(p => p == ".env" || p.EndsWith("/.env") || p.Contains("/.env."))),
             };
         }
 
