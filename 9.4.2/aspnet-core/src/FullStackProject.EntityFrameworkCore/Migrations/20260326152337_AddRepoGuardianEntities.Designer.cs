@@ -3,6 +3,7 @@ using System;
 using FullStackProject.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FullStackProject.Migrations
 {
     [DbContext(typeof(FullStackProjectDbContext))]
-    partial class FullStackProjectDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260326152337_AddRepoGuardianEntities")]
+    partial class AddRepoGuardianEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1665,12 +1668,7 @@ namespace FullStackProject.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("GithubRepositories");
                 });
@@ -1815,9 +1813,6 @@ namespace FullStackProject.Migrations
 
                     b.Property<long?>("LastModifierUserId")
                         .HasColumnType("bigint");
-
-                    b.Property<int?>("OverallScore")
-                        .HasColumnType("integer");
 
                     b.Property<Guid>("RepositoryId")
                         .HasColumnType("uuid");
@@ -2126,17 +2121,6 @@ namespace FullStackProject.Migrations
                         .IsRequired();
 
                     b.Navigation("ScanRun");
-                });
-
-            modelBuilder.Entity("FullStackProject.Domains.RepoGuardian.GithubRepository", b =>
-                {
-                    b.HasOne("FullStackProject.Authorization.Users.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FullStackProject.Domains.RepoGuardian.Recommendation", b =>
