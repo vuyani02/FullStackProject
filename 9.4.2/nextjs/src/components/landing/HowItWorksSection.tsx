@@ -9,6 +9,10 @@ const useStyles = createStyles(({ css }) => ({
   section: css`
     background: #f9fafb;
     padding: 100px 48px;
+
+    @media (max-width: 768px) {
+      padding: 64px 20px;
+    }
   `,
   inner: css`
     max-width: 1100px;
