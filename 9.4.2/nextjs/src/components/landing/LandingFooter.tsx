@@ -25,21 +25,17 @@ const useStyles = createStyles(({ css }) => ({
     gap: 32px;
   `,
   logo: css`
-    font-size: 20px;
-    font-weight: 800;
-    color: #ffffff;
-    letter-spacing: -0.5px;
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
   `,
-  dot: css`
-    width: 8px;
-    height: 8px;
-    background: #10b981;
-    border-radius: 50%;
-    display: inline-block;
+  logoText: css`
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1;
+    color: #ffffff;
   `,
   tagline: css`
     color: rgba(255, 255, 255, 0.45) !important;
@@ -93,6 +89,36 @@ const useStyles = createStyles(({ css }) => ({
   `,
 }));
 
+function FooterShieldIcon() {
+  return (
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 32 32"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <linearGradient id="footerShieldGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#4f46e5" />
+          <stop offset="100%" stopColor="#7c3aed" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M16 3L5 7.5V15c0 6.075 4.667 11.742 11 13 6.333-1.258 11-6.925 11-13V7.5L16 3Z"
+        fill="url(#footerShieldGrad)"
+      />
+      <path
+        d="M11 16l3.5 3.5L21 12"
+        stroke="#ffffff"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export default function LandingFooter() {
   const { styles } = useStyles();
 
@@ -102,8 +128,8 @@ export default function LandingFooter() {
         <div className={styles.top}>
           <div>
             <Link href="/" className={styles.logo}>
-              <span className={styles.dot} />
-              RepoGuardian
+              <FooterShieldIcon />
+              <span className={styles.logoText}>RepoGuardian</span>
             </Link>
             <Text className={styles.tagline}>AI-powered repository compliance</Text>
           </div>
