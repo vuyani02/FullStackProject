@@ -11,6 +11,25 @@ export const useStyles = createStyles(({ token }) => ({ ... }));
 ### antd
 - use ant design as much as possible.
 
+### Component Structure
+
+Every page must be broken into multiple components, each in its own file under a `components/` folder next to the page:
+
+```
+app/
+  repositories/
+    page.tsx                  → page shell only, composes components
+    components/
+      RepositoryTable.tsx
+      RepositoryTableRow.tsx
+      ScanButton.tsx
+      ScanResultModal.tsx
+```
+
+- `page.tsx` must only compose components — no inline UI logic
+- Each component lives in its own file inside `components/`
+- Shared components used across multiple pages go in `src/components/`
+
 **Forbidden patterns:**
 - Multiple Axios instances
 - Inline styles or non-antd-style CSS
