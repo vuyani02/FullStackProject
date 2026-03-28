@@ -6,11 +6,14 @@ using Abp.Domain.Repositories;
 using Abp.Domain.Services;
 using Abp.Domain.Uow;
 using Abp.UI;
+using Castle.Core.Logging;
 
 namespace FullStackProject.Domains.RepoGuardian
 {
     public class RepoGuardianManager : IDomainService
     {
+        public ILogger Logger { get; set; } = NullLogger.Instance;
+
         private readonly IRepository<GithubRepository, Guid> _repositoryRepo;
         private readonly IRepository<ScanRun, Guid> _scanRunRepo;
         private readonly IRepository<RuleResult, Guid> _ruleResultRepo;
@@ -65,6 +68,7 @@ namespace FullStackProject.Domains.RepoGuardian
 
         public async Task<ScanRun> CreateScanRunAsync(Guid repositoryId)
         {
+            Logger.InfoFormat("Creating scan run for repository {0}", repositoryId);
             var scanRun = await _scanRunRepo.InsertAsync(new ScanRun
             {
                 RepositoryId = repositoryId,
@@ -81,6 +85,7 @@ namespace FullStackProject.Domains.RepoGuardian
 
         public async Task UpdateScanStatusAsync(Guid scanRunId, ScanRunStatus status, string errorMessage = null)
         {
+            Logger.InfoFormat("Scan {0} status → {1}", scanRunId, status);
             var scanRun = await _scanRunRepo.GetAsync(scanRunId);
             scanRun.Status = status;
 
@@ -95,6 +100,7 @@ namespace FullStackProject.Domains.RepoGuardian
 
         public async Task SaveRuleResultsAsync(List<RuleResult> results)
         {
+            Logger.InfoFormat("Saving {0} rule results", results.Count);
             foreach (var result in results)
                 await _ruleResultRepo.InsertAsync(result);
 
@@ -130,6 +136,7 @@ namespace FullStackProject.Domains.RepoGuardian
             var scanRun = await _scanRunRepo.GetAsync(scanRunId);
             scanRun.OverallScore = overallScore;
             await _scanRunRepo.UpdateAsync(scanRun);
+            Logger.InfoFormat("Scan {0} overall score: {1}", scanRunId, overallScore);
 
             await _unitOfWorkManager.Current.SaveChangesAsync();
 
