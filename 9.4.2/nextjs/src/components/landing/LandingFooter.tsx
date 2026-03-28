@@ -10,6 +10,10 @@ const useStyles = createStyles(({ css }) => ({
   footer: css`
     background: #111827;
     padding: 56px 48px 32px;
+
+    @media (max-width: 768px) {
+      padding: 40px 20px 24px;
+    }
   `,
   inner: css`
     max-width: 1100px;
@@ -23,6 +27,10 @@ const useStyles = createStyles(({ css }) => ({
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     flex-wrap: wrap;
     gap: 32px;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
   `,
   logo: css`
     text-decoration: none;
