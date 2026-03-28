@@ -30,6 +30,10 @@ const useStyles = createStyles(({ css }) => ({
       background: radial-gradient(ellipse at center, rgba(79, 70, 229, 0.08) 0%, transparent 70%);
       pointer-events: none;
     }
+
+    @media (max-width: 768px) {
+      padding: 120px 20px 64px;
+    }
   `,
   badge: css`
     background: #eef2ff;
@@ -70,6 +74,12 @@ const useStyles = createStyles(({ css }) => ({
     margin-top: 64px;
     padding-top: 48px;
     border-top: 1px solid #f3f4f6;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
   `,
   stat: css`
     text-align: center;
@@ -79,6 +89,10 @@ const useStyles = createStyles(({ css }) => ({
     font-weight: 800;
     color: #4f46e5;
     line-height: 1;
+
+    @media (max-width: 768px) {
+      font-size: 24px;
+    }
   `,
   statLabel: css`
     font-size: 14px;
