@@ -56,11 +56,11 @@ namespace FullStackProject.Web.Host.Startup
                 client.DefaultRequestHeaders.Add("Accept", "application/vnd.github+json");
             });
 
-            // Grok AI client
-            services.AddHttpClient("Grok", client =>
+            // Gemini AI client (OpenAI-compatible endpoint)
+            services.AddHttpClient("Gemini", client =>
             {
-                client.BaseAddress = new Uri(_appConfiguration["Grok:ApiBaseUrl"]);
-                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + _appConfiguration["Grok:ApiKey"]);
+                client.BaseAddress = new Uri(_appConfiguration["Gemini:ApiBaseUrl"]);
+                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + _appConfiguration["Gemini:ApiKey"]);
             });
 
             // Configure CORS for angular2 UI
