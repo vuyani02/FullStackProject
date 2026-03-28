@@ -19,6 +19,10 @@ const useStyles = createStyles(({ css }) => ({
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    @media (max-width: 768px) {
+      padding: 0 20px;
+    }
   `,
   logo: css`
     text-decoration: none;
