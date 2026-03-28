@@ -116,7 +116,7 @@ const steps = [
   {
     number: "1",
     title: "Add a Repository",
-    text: "Paste the GitHub owner and repo name. No OAuth or private access required — RepoGuardian works entirely with the public GitHub API.",
+    text: "Paste your GitHub repo URL. No OAuth or private access required — RepoGuardian works entirely with the public GitHub API.",
   },
   {
     number: "2",
