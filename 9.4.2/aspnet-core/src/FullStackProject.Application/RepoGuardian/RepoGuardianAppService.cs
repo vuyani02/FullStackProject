@@ -6,6 +6,7 @@ using Abp.Authorization;
 using Abp.Domain.Repositories;
 using Abp.Runtime.Session;
 using FullStackProject.Domains.RepoGuardian;
+using FullStackProject.RepoGuardian.AI;
 using FullStackProject.RepoGuardian.Dto;
 using FullStackProject.RepoGuardian.GitHub;
 using FullStackProject.RepoGuardian.Rules;
@@ -22,30 +23,21 @@ namespace FullStackProject.RepoGuardian
         private readonly RepoGuardianManager _repoGuardianManager;
         private readonly GithubService _githubService;
         private readonly RuleEngine _ruleEngine;
+        private readonly AiExplanationService _aiExplanationService;
         private readonly IRepository<GithubRepository, Guid> _repositoryRepo;
-        private readonly IRepository<ScanRun, Guid> _scanRunRepo;
-        private readonly IRepository<RuleResult, Guid> _ruleResultRepo;
-        private readonly IRepository<ComplianceScore, Guid> _complianceScoreRepo;
-        private readonly IRepository<Recommendation, Guid> _recommendationRepo;
 
         public RepoGuardianAppService(
             RepoGuardianManager repoGuardianManager,
             GithubService githubService,
             RuleEngine ruleEngine,
-            IRepository<GithubRepository, Guid> repositoryRepo,
-            IRepository<ScanRun, Guid> scanRunRepo,
-            IRepository<RuleResult, Guid> ruleResultRepo,
-            IRepository<ComplianceScore, Guid> complianceScoreRepo,
-            IRepository<Recommendation, Guid> recommendationRepo)
+            AiExplanationService aiExplanationService,
+            IRepository<GithubRepository, Guid> repositoryRepo)
         {
             _repoGuardianManager = repoGuardianManager;
             _githubService = githubService;
             _ruleEngine = ruleEngine;
+            _aiExplanationService = aiExplanationService;
             _repositoryRepo = repositoryRepo;
-            _scanRunRepo = scanRunRepo;
-            _ruleResultRepo = ruleResultRepo;
-            _complianceScoreRepo = complianceScoreRepo;
-            _recommendationRepo = recommendationRepo;
         }
 
         /// <summary>
@@ -85,7 +77,7 @@ namespace FullStackProject.RepoGuardian
 
         /// <summary>
         /// Runs the full scan pipeline: fetches the GitHub file tree, evaluates rules,
-        /// calculates compliance scores, and returns the completed result.
+        /// calculates compliance scores, generates AI recommendations, and returns the result.
         /// </summary>
         public async Task<ScanResultDto> StartScanAsync(StartScanRequest request)
         {
@@ -96,12 +88,13 @@ namespace FullStackProject.RepoGuardian
                 await _repoGuardianManager.UpdateScanStatusAsync(scanRun.Id, ScanRunStatus.Running);
 
                 var repository = await _repositoryRepo.GetAsync(request.RepositoryId);
-                Logger.Info("StartScan: owner='" + repository.Owner + "' name='" + repository.Name + "'");
                 var filePaths = await _githubService.GetFileTreeAsync(repository.Owner, repository.Name);
 
                 var ruleResults = _ruleEngine.Evaluate(scanRun.Id, filePaths);
                 await _repoGuardianManager.SaveRuleResultsAsync(ruleResults);
                 await _repoGuardianManager.CalculateAndSaveScoresAsync(scanRun.Id, ruleResults);
+
+                await GenerateAndSaveRecommendationsAsync(ruleResults, repository.Owner, repository.Name);
 
                 await _repoGuardianManager.UpdateScanStatusAsync(scanRun.Id, ScanRunStatus.Completed);
 
@@ -117,11 +110,8 @@ namespace FullStackProject.RepoGuardian
         /// <summary>Returns the current state of a scan run including scores, rule results, and recommendations.</summary>
         public async Task<ScanResultDto> GetScanResultAsync(Guid scanRunId)
         {
-            var scanRun = await _scanRunRepo.GetAsync(scanRunId);
-            var ruleResults = await _ruleResultRepo.GetAllListAsync(r => r.ScanRunId == scanRunId);
-            var scores = await _complianceScoreRepo.GetAllListAsync(s => s.ScanRunId == scanRunId);
-            var ruleResultIds = ruleResults.Select(r => r.Id).ToList();
-            var recommendations = await _recommendationRepo.GetAllListAsync(r => ruleResultIds.Contains(r.RuleResultId));
+            var (scanRun, ruleResults, scores, recommendations) =
+                await _repoGuardianManager.GetScanDataAsync(scanRunId);
 
             return new ScanResultDto
             {
@@ -152,6 +142,22 @@ namespace FullStackProject.RepoGuardian
                     SuggestedFix = r.SuggestedFix
                 }).ToList()
             };
+        }
+
+        private async Task GenerateAndSaveRecommendationsAsync(
+            List<RuleResult> ruleResults, string owner, string repo)
+        {
+            var failedRules = ruleResults.Where(r => !r.Passed).ToList();
+            var recommendations = new List<Recommendation>();
+
+            foreach (var failedRule in failedRules)
+            {
+                var recommendation = await _aiExplanationService.GetRecommendationAsync(failedRule, owner, repo);
+                if (recommendation != null)
+                    recommendations.Add(recommendation);
+            }
+
+            await _repoGuardianManager.SaveRecommendationsAsync(recommendations);
         }
 
         private RepositoryDto MapToRepositoryDto(GithubRepository repo) => new RepositoryDto

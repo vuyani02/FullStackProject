@@ -147,6 +147,22 @@ namespace FullStackProject.Domains.RepoGuardian
         {
             foreach (var rec in recommendations)
                 await _recommendationRepo.InsertAsync(rec);
+
+            await _unitOfWorkManager.Current.SaveChangesAsync();
+        }
+
+        /// <summary>
+        /// Fetches all data needed to build a ScanResultDto for the given scan run.
+        /// </summary>
+        public async Task<(ScanRun ScanRun, List<RuleResult> RuleResults, List<ComplianceScore> Scores, List<Recommendation> Recommendations)> GetScanDataAsync(Guid scanRunId)
+        {
+            var scanRun = await _scanRunRepo.GetAsync(scanRunId);
+            var ruleResults = await _ruleResultRepo.GetAllListAsync(r => r.ScanRunId == scanRunId);
+            var scores = await _complianceScoreRepo.GetAllListAsync(s => s.ScanRunId == scanRunId);
+            var ruleResultIds = ruleResults.Select(r => r.Id).ToList();
+            var recommendations = await _recommendationRepo.GetAllListAsync(r => ruleResultIds.Contains(r.RuleResultId));
+
+            return (scanRun, ruleResults, scores, recommendations);
         }
     }
 }
