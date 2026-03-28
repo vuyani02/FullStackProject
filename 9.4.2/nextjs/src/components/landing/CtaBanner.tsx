@@ -42,6 +42,10 @@ const useStyles = createStyles(({ css }) => ({
       background: rgba(255, 255, 255, 0.04);
       border-radius: 50%;
     }
+
+    @media (max-width: 768px) {
+      padding: 48px 32px;
+    }
   `,
   heading: css`
     font-size: clamp(28px, 4vw, 44px) !important;
@@ -49,6 +53,10 @@ const useStyles = createStyles(({ css }) => ({
     color: #ffffff !important;
     letter-spacing: -1px !important;
     margin-bottom: 16px !important;
+
+    @media (max-width: 768px) {
+      font-size: 26px !important;
+    }
   `,
   subheading: css`
     font-size: 18px !important;
