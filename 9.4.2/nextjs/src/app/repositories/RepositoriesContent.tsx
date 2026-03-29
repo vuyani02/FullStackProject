@@ -1,0 +1,59 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import { Button, Typography } from 'antd'
+import { useStyles } from './style'
+import { RepositoryProvider, useRepositoryActions, useRepositoryState } from '@/providers/repositories'
+import AppNavbar from '@/components/app/AppNavbar'
+import RepositoryTable from './components/RepositoryTable'
+import AddRepositoryModal from './components/AddRepositoryModal'
+import ScanResultModal from './components/ScanResultModal'
+
+const { Title } = Typography
+
+function RepositoriesInner() {
+  const { styles } = useStyles()
+  const [addOpen, setAddOpen] = useState(false)
+  const { getRepositories } = useRepositoryActions()
+  const { scanResult } = useRepositoryState()
+
+  useEffect(() => {
+    getRepositories()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  return (
+    <div className={styles.page}>
+      <AppNavbar />
+
+      <div className={styles.content}>
+        <div className={styles.header}>
+          <Title className={styles.title}>Repositories</Title>
+          <Button
+            type="primary"
+            size="large"
+            onClick={() => setAddOpen(true)}
+            style={{ background: '#4f46e5', borderColor: '#4f46e5', borderRadius: 10, fontWeight: 600 }}
+          >
+            + Add Repository
+          </Button>
+        </div>
+
+        <div className={styles.tableWrap}>
+          <RepositoryTable />
+        </div>
+      </div>
+
+      <AddRepositoryModal open={addOpen} onClose={() => setAddOpen(false)} />
+      {scanResult && <ScanResultModal />}
+    </div>
+  )
+}
+
+export default function RepositoriesContent() {
+  return (
+    <RepositoryProvider>
+      <RepositoriesInner />
+    </RepositoryProvider>
+  )
+}
