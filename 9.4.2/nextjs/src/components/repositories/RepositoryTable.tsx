@@ -27,6 +27,11 @@ const useStyles = createStyles(({ css }) => ({
     white-space: nowrap;
     display: block;
   `,
+  scanBtn: css`
+    background: #4f46e5 !important;
+    border-color: #4f46e5 !important;
+    border-radius: 8px !important;
+  `,
 }))
 
 export default function RepositoryTable() {
@@ -65,7 +70,7 @@ export default function RepositoryTable() {
           loading={isScanPending && scanningRepositoryId === row.id}
           disabled={isScanPending && scanningRepositoryId !== row.id}
           onClick={() => startScan(row.id)}
-          style={{ background: '#4f46e5', borderColor: '#4f46e5', borderRadius: 8 }}
+          className={styles.scanBtn}
         >
           Scan
         </Button>

@@ -34,4 +34,10 @@ export const useStyles = createStyles(({ css }) => ({
     border: 1px solid #f3f4f6;
     overflow: hidden;
   `,
+  addBtn: css`
+    background: #4f46e5 !important;
+    border-color: #4f46e5 !important;
+    border-radius: 10px !important;
+    font-weight: 600 !important;
+  `,
 }))

@@ -1,7 +1,18 @@
 'use client'
 
 import { Form, Input, Modal } from 'antd'
+import { createStyles } from 'antd-style'
 import { useRepositoryActions, useRepositoryState } from '@/providers/repositories'
+
+const useStyles = createStyles(({ css }) => ({
+  modalTitle: css`font-weight: 700;`,
+  form: css`margin-top: 16px;`,
+  input: css`border-radius: 10px !important;`,
+  okBtn: css`
+    background: #4f46e5 !important;
+    border-color: #4f46e5 !important;
+  `,
+}))
 
 interface Props {
   open: boolean
@@ -9,6 +20,7 @@ interface Props {
 }
 
 export default function AddRepositoryModal({ open, onClose }: Props) {
+  const { styles } = useStyles()
   const [form] = Form.useForm()
   const { addRepository } = useRepositoryActions()
   const { isAddPending } = useRepositoryState()
@@ -25,14 +37,11 @@ export default function AddRepositoryModal({ open, onClose }: Props) {
       onCancel={onClose}
       onOk={() => form.submit()}
       okText="Add Repository"
-      okButtonProps={{
-        loading: isAddPending,
-        style: { background: '#4f46e5', borderColor: '#4f46e5' },
-      }}
-      title={<span style={{ fontWeight: 700 }}>Add Repository</span>}
+      okButtonProps={{ loading: isAddPending, className: styles.okBtn }}
+      title={<span className={styles.modalTitle}>Add Repository</span>}
       destroyOnClose
     >
-      <Form form={form} layout="vertical" onFinish={handleSubmit} style={{ marginTop: 16 }}>
+      <Form form={form} layout="vertical" onFinish={handleSubmit} className={styles.form}>
         <Form.Item
           label="GitHub URL"
           name="githubUrl"
@@ -47,7 +56,7 @@ export default function AddRepositoryModal({ open, onClose }: Props) {
           <Input
             size="large"
             placeholder="https://github.com/owner/repo"
-            style={{ borderRadius: 10 }}
+            className={styles.input}
           />
         </Form.Item>
       </Form>

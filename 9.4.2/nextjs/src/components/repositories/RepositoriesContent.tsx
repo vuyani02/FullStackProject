@@ -33,7 +33,7 @@ function RepositoriesInner() {
             type="primary"
             size="large"
             onClick={() => setAddOpen(true)}
-            style={{ background: '#4f46e5', borderColor: '#4f46e5', borderRadius: 10, fontWeight: 600 }}
+            className={styles.addBtn}
           >
             + Add Repository
           </Button>

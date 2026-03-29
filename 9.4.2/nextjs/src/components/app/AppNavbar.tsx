@@ -70,6 +70,10 @@ const useStyles = createStyles(({ css }) => ({
     align-items: center;
     gap: 12px;
   `,
+  logoutBtn: css`
+    color: #9ca3af !important;
+    font-size: 14px !important;
+  `,
 }))
 
 function ShieldIcon() {
@@ -130,7 +134,7 @@ export default function AppNavbar() {
           type="text"
           size="small"
           onClick={handleLogout}
-          style={{ color: '#9ca3af', fontSize: 14 }}
+          className={styles.logoutBtn}
         >
           Log out
         </Button>
