@@ -56,6 +56,14 @@ dotnet test
 docker-compose up
 ```
 
+## GitHub Issues
+
+When creating GitHub issues, follow the templates in [`ISSUE_TEMPLATES.md`](./ISSUE_TEMPLATES.md):
+- **Feature request** — use the feature template (problem, solution, alternatives, context)
+- **Bug** — use the bug template (description, reproduce steps, expected behaviour, screenshots, environment, context)
+
+The `gh` CLI is installed at `C:/Program Files/GitHub CLI/gh.exe`. Use the full path when invoking it from bash.
+
 ## Collaboration Rules
 
 **Defend decisions — never cave to pushback without a reason.** If the user challenges a technical decision, explain why the original approach was correct. Only change course if they provide a genuinely better technical argument. Agreeing just because the user disagrees is unhelpful and leads to worse code.
