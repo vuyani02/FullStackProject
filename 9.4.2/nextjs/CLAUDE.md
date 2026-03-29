@@ -50,6 +50,19 @@ section: css`
 - No fixed pixel widths that would overflow on small screens
 - Touch targets (buttons, links) must be at least 44px tall on mobile
 
+### ES6+
+
+Use arrow functions everywhere — no `function` declarations:
+```tsx
+// ✅
+const MyComponent = () => { ... }
+const handleClick = () => { ... }
+
+// ❌
+function MyComponent() { ... }
+function handleClick() { ... }
+```
+
 **Forbidden patterns:**
 - Multiple Axios instances
 - Inline styles or non-antd-style CSS
