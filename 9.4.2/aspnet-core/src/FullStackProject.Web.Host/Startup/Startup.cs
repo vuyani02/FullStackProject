@@ -133,6 +133,20 @@ namespace FullStackProject.Web.Host.Startup
             // Must be first — makes Request.IsHttps = true when behind Render's HTTPS proxy
             app.UseForwardedHeaders();
             app.UseCookiePolicy();
+
+            // Some reverse proxies strip headers whose names contain dots (e.g. "Abp.TenantId").
+            // The frontend sends the tenant ID as a query-string parameter as a safe fallback.
+            // Copy it into the request header here so ABP's built-in header resolver picks it up.
+            app.Use(async (context, next) =>
+            {
+                if (!context.Request.Headers.ContainsKey("Abp.TenantId") &&
+                    context.Request.Query.TryGetValue("Abp.TenantId", out var tenantIdValues))
+                {
+                    context.Request.Headers["Abp.TenantId"] = tenantIdValues.ToString();
+                }
+                await next();
+            });
+
             app.UseAbp(options => { options.UseAbpRequestLocalization = false; }); // Initializes ABP framework.
 
             app.UseCors(_defaultCorsPolicyName); // Enable CORS!
