@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { Button, Typography } from 'antd'
-import { useStyles } from '@/app/repositories/style'
+import { useStyles } from '@/app/(app)/repositories/style'
 import { RepositoryProvider, useRepositoryActions, useRepositoryState } from '@/providers/repositories'
-import AppNavbar from '@/components/app/AppNavbar'
 import RepositoryTable from './RepositoryTable'
 import AddRepositoryModal from './AddRepositoryModal'
 import ScanResultModal from './ScanResultModal'
@@ -23,25 +22,21 @@ const RepositoriesInner = () => {
   }, [])
 
   return (
-    <div className={styles.page}>
-      <AppNavbar />
+    <div className={styles.content}>
+      <div className={styles.header}>
+        <Title className={styles.title}>Repositories</Title>
+        <Button
+          type="primary"
+          size="large"
+          onClick={() => setAddOpen(true)}
+          className={styles.addBtn}
+        >
+          + Add Repository
+        </Button>
+      </div>
 
-      <div className={styles.content}>
-        <div className={styles.header}>
-          <Title className={styles.title}>Repositories</Title>
-          <Button
-            type="primary"
-            size="large"
-            onClick={() => setAddOpen(true)}
-            className={styles.addBtn}
-          >
-            + Add Repository
-          </Button>
-        </div>
-
-        <div className={styles.tableWrap}>
-          <RepositoryTable />
-        </div>
+      <div className={styles.tableWrap}>
+        <RepositoryTable />
       </div>
 
       <AddRepositoryModal open={addOpen} onClose={() => setAddOpen(false)} />
