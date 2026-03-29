@@ -58,6 +58,7 @@ const RepositoryTable = () => {
       rowKey="id"
       loading={isPending}
       pagination={false}
+      scroll={{ x: 'max-content' }}
       locale={{ emptyText: 'No repositories yet. Add one to get started.' }}
     />
   )
