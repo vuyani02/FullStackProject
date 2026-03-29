@@ -16,6 +16,7 @@ const RepositoryTable = () => {
     {
       title: 'Repository',
       key: 'name',
+      minWidth: 180,
       render: (_: unknown, row: IRepository) => (
         <div>
           <div className={styles.repoName}>{row.name}</div>
@@ -26,6 +27,7 @@ const RepositoryTable = () => {
     {
       title: 'GitHub URL',
       key: 'githubUrl',
+      minWidth: 260,
       render: (_: unknown, row: IRepository) => (
         <Link href={row.githubUrl} target="_blank" className={styles.url}>
           {row.githubUrl}
@@ -58,7 +60,6 @@ const RepositoryTable = () => {
       rowKey="id"
       loading={isPending}
       pagination={false}
-      scroll={{ x: 'max-content' }}
       locale={{ emptyText: 'No repositories yet. Add one to get started.' }}
     />
   )
