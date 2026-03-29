@@ -2,10 +2,30 @@
 
 ### Styling
 
-All styles use `antd-style`'s `createStyles`, co-located as `app/<route>/style.ts`:
+All styles use `antd-style`'s `createStyles`. **No inline styles ever.**
+
+**Pages** — styles live in `app/<route>/style.ts` (same folder as `page.tsx`):
+```
+app/repositories/style.ts
+```
+
+**Components** — styles live in a `styles/` subfolder inside the component's feature folder, named `<ComponentName>.style.ts`:
+```
+src/components/repositories/styles/RepositoryTable.style.ts
+src/components/repositories/styles/AddRepositoryModal.style.ts
+src/components/app/styles/AppNavbar.style.ts
+src/components/landing/styles/HeroSection.style.ts
+```
+
+Each style file exports only `useStyles`:
+```ts
+import { createStyles } from 'antd-style'
+export const useStyles = createStyles(({ css }) => ({ ... }))
+```
+
+The component imports from its style file:
 ```tsx
-import { createStyles } from "antd-style";
-export const useStyles = createStyles(({ token }) => ({ ... }));
+import { useStyles } from './styles/MyComponent.style'
 ```
 
 ### antd
@@ -28,7 +48,9 @@ app/
 
 - `page.tsx` must only compose components — no inline UI logic
 - Each component lives in its own file inside `components/`
-- Shared components used across multiple pages go in `src/components/`
+- All components go in `src/components/<feature>/` — never inside the `app/` folder
+- Group by feature: `src/components/repositories/`, `src/components/auth/`, `src/components/landing/`, `src/components/app/`, etc.
+- `src/components/app/` is for shared layout components (navbar, sidebar, etc.)
 
 ### Mobile Responsiveness
 
@@ -48,12 +70,26 @@ section: css`
 - No fixed pixel widths that would overflow on small screens
 - Touch targets (buttons, links) must be at least 44px tall on mobile
 
+### ES6+
+
+Use arrow functions everywhere — no `function` declarations:
+```tsx
+// ✅
+const MyComponent = () => { ... }
+const handleClick = () => { ... }
+
+// ❌
+function MyComponent() { ... }
+function handleClick() { ... }
+```
+
 **Forbidden patterns:**
 - Multiple Axios instances
 - Inline styles or non-antd-style CSS
 - Provider files outside the 4-file structure below
 - Under app folder only folders with page.ts must exist.
 - When ever you do something tell me what you are trying to do, don't just do.
+- Splitting a page into `page.tsx` + a separate `XxxContent` component when there is no server-side logic in `page.tsx`. Only split when `page.tsx` contains actual `async`/`await` work (data fetching, `verifySession`, etc.). If there is no server-side logic, put everything directly in `page.tsx`.
 
 ### Providers
 

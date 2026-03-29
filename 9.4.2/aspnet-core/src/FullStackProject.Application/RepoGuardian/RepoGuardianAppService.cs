@@ -67,11 +67,10 @@ namespace FullStackProject.RepoGuardian
             return MapToRepositoryDto(repo);
         }
 
-        /// <summary>Returns all repositories registered by the current user.</summary>
+        /// <summary>Returns all repositories registered under the current tenant.</summary>
         public async Task<List<RepositoryDto>> GetRepositoriesAsync()
         {
-            var userId = AbpSession.GetUserId();
-            var repos = await _repositoryRepo.GetAllListAsync(r => r.UserId == userId);
+            var repos = await _repositoryRepo.GetAllListAsync();
             return repos.Select(MapToRepositoryDto).ToList();
         }
 
@@ -137,6 +136,7 @@ namespace FullStackProject.RepoGuardian
                 Recommendations = recommendations.Select(r => new RecommendationDto
                 {
                     RuleResultId = r.RuleResultId,
+                    RuleId = ruleResults.FirstOrDefault(rr => rr.Id == r.RuleResultId)?.RuleId,
                     IssueDescription = r.IssueDescription,
                     Explanation = r.Explanation,
                     SuggestedFix = r.SuggestedFix

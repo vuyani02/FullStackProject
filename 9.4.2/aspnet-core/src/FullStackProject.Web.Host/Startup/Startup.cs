@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -37,6 +38,22 @@ namespace FullStackProject.Web.Host.Startup
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // Allow ABP's Abp.TenantId cookie to work on deployed HTTPS environments
+            // (Render and other platforms require SameSite=None; Secure for cross-site cookies)
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.OnAppendCookie = ctx =>
+                {
+                    ctx.CookieOptions.SameSite = SameSiteMode.None;
+                    ctx.CookieOptions.Secure = true;
+                };
+                options.OnDeleteCookie = ctx =>
+                {
+                    ctx.CookieOptions.SameSite = SameSiteMode.None;
+                    ctx.CookieOptions.Secure = true;
+                };
+            });
+
             //MVC
             services.AddControllersWithViews(options =>
             {
@@ -98,6 +115,7 @@ namespace FullStackProject.Web.Host.Startup
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
+            app.UseCookiePolicy();
             app.UseAbp(options => { options.UseAbpRequestLocalization = false; }); // Initializes ABP framework.
 
             app.UseCors(_defaultCorsPolicyName); // Enable CORS!
