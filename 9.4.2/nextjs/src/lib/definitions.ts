@@ -24,6 +24,7 @@ export interface IRuleResult {
 
 export interface IRecommendation {
   ruleResultId: string
+  ruleId: string
   issueDescription: string
   explanation: string
   suggestedFix: string

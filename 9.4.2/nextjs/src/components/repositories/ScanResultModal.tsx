@@ -73,7 +73,7 @@ const ScanResultModal = () => {
 
   const recItems = scanResult.recommendations.map((rec: IRecommendation, i) => ({
     key: String(i),
-    label: <span className={styles.recCollapseLabel}>{ruleNameMap[rec.ruleResultId] ?? rec.ruleResultId}</span>,
+    label: <span className={styles.recCollapseLabel}>{ruleNameMap[rec.ruleId] ?? rec.ruleId}</span>,
     children: <RecommendationBody rec={rec} />,
   }))
 
