@@ -3,14 +3,14 @@
 import { useEffect, useState } from 'react'
 import { Button, Typography } from 'antd'
 import { useStyles } from '@/app/(main)/repositories/style'
-import { RepositoryProvider, useRepositoryActions, useRepositoryState } from '@/providers/repositories'
+import { useRepositoryActions, useRepositoryState } from '@/providers/repositories'
 import RepositoryTable from './RepositoryTable'
 import AddRepositoryModal from './AddRepositoryModal'
 import ScanResultModal from './ScanResultModal'
 
 const { Title } = Typography
 
-const RepositoriesInner = () => {
+const RepositoriesContent = () => {
   const { styles } = useStyles()
   const [addOpen, setAddOpen] = useState(false)
   const { getRepositories } = useRepositoryActions()
@@ -42,14 +42,6 @@ const RepositoriesInner = () => {
       <AddRepositoryModal open={addOpen} onClose={() => setAddOpen(false)} />
       {scanResult && <ScanResultModal />}
     </div>
-  )
-}
-
-const RepositoriesContent = () => {
-  return (
-    <RepositoryProvider>
-      <RepositoriesInner />
-    </RepositoryProvider>
   )
 }
 
