@@ -2,10 +2,14 @@
 
 import { Badge, Collapse, Modal, Progress, Table, Tag, Typography } from 'antd'
 import { IRecommendation, IRuleResult, IScanResult } from '@/lib/definitions'
-import { useRepositoryActions, useRepositoryState } from '@/providers/repositories'
 import { useStyles } from './styles/ScanResultModal.style'
 
 const { Title, Text, Paragraph } = Typography
+
+interface ScanResultModalProps {
+  scanResult: IScanResult
+  onClose: () => void
+}
 
 const scoreVariant = (score: number): 'green' | 'amber' | 'red' => {
   if (score >= 80) return 'green'
@@ -19,12 +23,8 @@ const scoreHex = (score: number): string => {
   return '#ef4444'
 }
 
-const ScanResultModal = () => {
+const ScanResultModal = ({ scanResult, onClose }: ScanResultModalProps) => {
   const { styles } = useStyles()
-  const { scanResult } = useRepositoryState()
-  const { clearScanResult } = useRepositoryActions()
-
-  if (!scanResult) return null
 
   const overall = scanResult.overallScore ?? 0
   const variant = scoreVariant(overall)
@@ -80,7 +80,7 @@ const ScanResultModal = () => {
   return (
     <Modal
       open
-      onCancel={clearScanResult}
+      onCancel={onClose}
       footer={null}
       width={780}
       title={<span className={styles.modalTitle}>Scan Result</span>}
