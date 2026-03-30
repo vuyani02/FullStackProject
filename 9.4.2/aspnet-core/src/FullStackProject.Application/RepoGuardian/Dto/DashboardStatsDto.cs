@@ -19,5 +19,14 @@ namespace FullStackProject.RepoGuardian.Dto
 
         /// <summary>Per-category average scores across the filtered scans.</summary>
         public List<CategoryAverageDto> CategoryAverages { get; set; } = new();
+
+        /// <summary>Number of repositories whose latest completed scan scored below the passing threshold.</summary>
+        public int ReposBelowThreshold { get; set; }
+
+        /// <summary>The most recently triggered scan run, or null if no scans exist.</summary>
+        public MostRecentScanDto MostRecentScan { get; set; }
+
+        /// <summary>The rule that failed most often across the filtered scans, or null if no failures exist.</summary>
+        public MostFailingRuleDto MostFailingRule { get; set; }
     }
 }
