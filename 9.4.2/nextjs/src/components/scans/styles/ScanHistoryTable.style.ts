@@ -17,4 +17,27 @@ export const useStyles = createStyles(({ css }) => ({
   viewBtn: css`
     border-radius: 8px;
   `,
+  toolbar: css`
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 16px 12px;
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  `,
+  searchInput: css`
+    flex: 1;
+    min-width: 200px;
+  `,
+  filterSelect: css`
+    width: 160px;
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  `,
 }))

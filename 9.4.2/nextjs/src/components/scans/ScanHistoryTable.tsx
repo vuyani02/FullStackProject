@@ -1,13 +1,11 @@
 'use client'
 
-import { Button, Table, Tag } from 'antd'
-import { IScanSummary } from '@/lib/definitions'
+import { useState } from 'react'
+import { Button, Input, Select, Table, Tag } from 'antd'
+import { IScanSummary, ScanHistoryTableProps } from '@/Types/Scan/Types'
 import { useScansState } from '@/providers/scans'
 import { useStyles } from './styles/ScanHistoryTable.style'
 
-interface ScanHistoryTableProps {
-  onView: (scanRunId: string) => void
-}
 
 const scoreVariant = (score: number | null) => {
   if (score === null) return 'pending'
@@ -16,9 +14,42 @@ const scoreVariant = (score: number | null) => {
   return 'red'
 }
 
+const STATUS_OPTIONS = [
+  { label: 'All statuses', value: '' },
+  { label: 'Completed', value: 'Completed' },
+  { label: 'Running', value: 'Running' },
+  { label: 'Failed', value: 'Failed' },
+  { label: 'Pending', value: 'Pending' },
+]
+
+const SCORE_OPTIONS = [
+  { label: 'All scores', value: '' },
+  { label: 'Good (≥ 80)', value: 'green' },
+  { label: 'Fair (50 – 79)', value: 'amber' },
+  { label: 'Poor (< 50)', value: 'red' },
+  { label: 'Pending', value: 'pending' },
+]
+
 const ScanHistoryTable = ({ onView }: ScanHistoryTableProps) => {
   const { styles } = useStyles()
   const { scans, isPending } = useScansState()
+
+  const [search, setSearch] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const [scoreFilter, setScoreFilter] = useState('')
+
+  const filtered = (scans ?? []).filter((row) => {
+    const matchesSearch =
+      !search ||
+      row.repositoryName.toLowerCase().includes(search.toLowerCase()) ||
+      row.owner.toLowerCase().includes(search.toLowerCase())
+
+    const matchesStatus = !statusFilter || row.status === statusFilter
+
+    const matchesScore = !scoreFilter || scoreVariant(row.overallScore) === scoreFilter
+
+    return matchesSearch && matchesStatus && matchesScore
+  })
 
   const columns = [
     {
@@ -81,15 +112,39 @@ const ScanHistoryTable = ({ onView }: ScanHistoryTableProps) => {
   ]
 
   return (
-    <Table
-      dataSource={scans ?? []}
-      columns={columns}
-      rowKey="scanRunId"
-      loading={isPending}
-      pagination={{ pageSize: 20 }}
-      scroll={{ x: 'max-content' }}
-      locale={{ emptyText: 'No scans yet. Run your first scan to get started.' }}
-    />
+    <div>
+      <div className={styles.toolbar}>
+        <Input.Search
+          placeholder="Search by repo or owner…"
+          allowClear
+          className={styles.searchInput}
+          onSearch={setSearch}
+          onChange={(e) => { if (!e.target.value) setSearch('') }}
+        />
+        <Select
+          options={STATUS_OPTIONS}
+          value={statusFilter}
+          onChange={setStatusFilter}
+          className={styles.filterSelect}
+        />
+        <Select
+          options={SCORE_OPTIONS}
+          value={scoreFilter}
+          onChange={setScoreFilter}
+          className={styles.filterSelect}
+        />
+      </div>
+
+      <Table
+        dataSource={filtered}
+        columns={columns}
+        rowKey="scanRunId"
+        loading={isPending}
+        pagination={{ defaultPageSize: 5, showSizeChanger: true, pageSizeOptions: ['5', '10', '20', '50'] }}
+        scroll={{ x: 'max-content' }}
+        locale={{ emptyText: 'No scans match your filters.' }}
+      />
+    </div>
   )
 }
 
