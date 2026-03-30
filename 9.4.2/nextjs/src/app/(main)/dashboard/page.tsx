@@ -1,16 +1,31 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Button, Typography } from 'antd'
+import { Button, Select, Typography } from 'antd'
 import { RadarChartOutlined } from '@ant-design/icons'
 import { useDashboardState, useDashboardActions } from '@/providers/dashboard'
 import StatsCard from '@/components/dashboard/StatsCard'
 import StartScanModal from '@/components/scans/StartScanModal'
 import ScanResultModal from '@/components/repositories/ScanResultModal'
 import { IScanResult } from '@/Types/Scan/Types'
+import { IDashboardFilters } from '@/Types/Dashboard/Types'
 import { useStyles } from './style'
 
 const { Title, Text } = Typography
+
+const DAYS_OPTIONS = [
+  { label: 'Past 7 days', value: 7 },
+  { label: 'Past 30 days', value: 30 },
+  { label: 'Past 90 days', value: 90 },
+  { label: 'All time', value: null },
+]
+
+const SCOPE_OPTIONS = [
+  { label: 'Latest scan per repo', value: true },
+  { label: 'All scans', value: false },
+]
+
+const DEFAULT_FILTERS: IDashboardFilters = { daysBack: 7, latestPerRepo: true }
 
 const scoreVariant = (score: number | null): 'green' | 'amber' | 'red' | 'default' => {
   if (score === null) return 'default'
@@ -24,17 +39,18 @@ const DashboardPage = () => {
   const { stats, isPending } = useDashboardState()
   const { getDashboardStats } = useDashboardActions()
 
+  const [filters, setFilters] = useState<IDashboardFilters>(DEFAULT_FILTERS)
   const [scanOpen, setScanOpen] = useState(false)
   const [isScanning, setIsScanning] = useState(false)
   const [viewedResult, setViewedResult] = useState<IScanResult | null>(null)
 
   useEffect(() => {
-    getDashboardStats()
+    getDashboardStats(filters)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [filters])
 
   const handleScanComplete = (result: IScanResult) => {
-    getDashboardStats()
+    getDashboardStats(filters)
     setViewedResult(result)
   }
 
@@ -53,6 +69,21 @@ const DashboardPage = () => {
         >
           <RadarChartOutlined spin={isScanning} /> Scan
         </Button>
+      </div>
+
+      <div className={styles.filters}>
+        <Select
+          options={DAYS_OPTIONS}
+          value={filters.daysBack}
+          onChange={(val) => setFilters((f) => ({ ...f, daysBack: val }))}
+          className={styles.filterSelect}
+        />
+        <Select
+          options={SCOPE_OPTIONS}
+          value={filters.latestPerRepo}
+          onChange={(val) => setFilters((f) => ({ ...f, latestPerRepo: val }))}
+          className={styles.filterSelect}
+        />
       </div>
 
       <div className={styles.statsGrid}>

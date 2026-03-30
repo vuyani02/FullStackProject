@@ -33,6 +33,23 @@ export const useStyles = createStyles(({ css }) => ({
     font-size: 14px !important;
     color: #6b7280 !important;
   `,
+  filters: css`
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+  `,
+  filterSelect: css`
+    width: 200px;
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  `,
   statsGrid: css`
     display: flex;
     gap: 20px;
