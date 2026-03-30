@@ -25,5 +25,8 @@ namespace FullStackProject.RepoGuardian
 
         /// <summary>Returns aggregated dashboard statistics for the current tenant, filtered by date range and scan scope.</summary>
         Task<DashboardStatsDto> GetDashboardStatsAsync(DashboardStatsRequest request);
+
+        /// <summary>Returns metadata and full scan history for a single repository.</summary>
+        Task<RepositoryDetailDto> GetRepositoryDetailAsync(Guid id);
     }
 }
