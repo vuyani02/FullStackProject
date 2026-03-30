@@ -196,7 +196,8 @@ namespace FullStackProject.RepoGuardian
                 CategoryAverages = categoryAverages,
                 ReposBelowThreshold = ComputeReposBelowThreshold(allScanRuns),
                 MostRecentScan = ComputeMostRecentScan(allScanRuns, repoMap),
-                MostFailingRule = ComputeMostFailingRule(failedRuleResults)
+                MostFailingRule = ComputeMostFailingRule(failedRuleResults),
+                TrendData = ComputeTrendData(allScanRuns, request.DaysBack)
             };
         }
 
@@ -245,6 +246,74 @@ namespace FullStackProject.RepoGuardian
                 })
                 .OrderByDescending(r => r.FailCount)
                 .First();
+        }
+
+        // Cap "all time" trend to this many days so the chart stays readable.
+        private const int MaxTrendDays = 90;
+
+        /// <summary>
+        /// Builds a daily series of average compliance scores.
+        /// Each day's score is the average of each repo's most recently known completed scan up to that date.
+        /// Days before any repo has a scan are omitted.
+        /// </summary>
+        private static List<DailyAverageDto> ComputeTrendData(List<ScanRun> allScanRuns, int? daysBack)
+        {
+            var today = DateTime.UtcNow.Date;
+            var windowDays = daysBack ?? MaxTrendDays;
+            var startDate = today.AddDays(-(windowDays - 1));
+
+            var completed = allScanRuns
+                .Where(s => s.Status == ScanRunStatus.Completed && s.OverallScore.HasValue)
+                .ToList();
+
+            var trendData = new List<DailyAverageDto>();
+
+            for (var day = startDate; day <= today; day = day.AddDays(1))
+            {
+                // For each repo find its latest scan up to this day
+                var dayScores = completed
+                    .Where(s => s.TriggeredAt.Date <= day)
+                    .GroupBy(s => s.RepositoryId)
+                    .Select(g => (double)g.OrderByDescending(s => s.TriggeredAt).First().OverallScore.Value)
+                    .ToList();
+
+                // Skip days where no repo has been scanned yet
+                if (dayScores.Count == 0) continue;
+
+                trendData.Add(new DailyAverageDto
+                {
+                    Date = day.ToString("yyyy-MM-dd"),
+                    AverageScore = Math.Round(dayScores.Average(), 1)
+                });
+            }
+
+            return trendData;
+        }
+
+        /// <summary>Returns metadata and full scan history for a single repository.</summary>
+        public async Task<RepositoryDetailDto> GetRepositoryDetailAsync(Guid id)
+        {
+            var repository = await _repositoryRepo.GetAsync(id);
+            var scans = await _scanRunRepo.GetAllListAsync(s => s.RepositoryId == id);
+
+            return new RepositoryDetailDto
+            {
+                Repository = MapToRepositoryDto(repository),
+                Scans = scans
+                    .OrderByDescending(s => s.TriggeredAt)
+                    .Select(s => new ScanSummaryDto
+                    {
+                        ScanRunId = s.Id,
+                        RepositoryId = s.RepositoryId,
+                        RepositoryName = repository.Name,
+                        Owner = repository.Owner,
+                        Status = s.Status.ToString(),
+                        OverallScore = s.OverallScore,
+                        TriggeredAt = s.TriggeredAt,
+                        CompletedAt = s.CompletedAt
+                    })
+                    .ToList()
+            };
         }
 
         private static List<ScanRun> ApplyDateFilter(List<ScanRun> scanRuns, int? daysBack)
