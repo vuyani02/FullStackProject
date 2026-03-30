@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace FullStackProject.RepoGuardian.Dto
 {
     /// <summary>Aggregated statistics shown on the dashboard for the current tenant.</summary>
@@ -14,5 +16,8 @@ namespace FullStackProject.RepoGuardian.Dto
         /// Null when no completed scans exist yet.
         /// </summary>
         public double? AverageComplianceScore { get; set; }
+
+        /// <summary>Per-category average scores across the filtered scans.</summary>
+        public List<CategoryAverageDto> CategoryAverages { get; set; } = new();
     }
 }
