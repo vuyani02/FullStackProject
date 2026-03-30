@@ -26,6 +26,7 @@ namespace FullStackProject.RepoGuardian
         private readonly AiExplanationService _aiExplanationService;
         private readonly IRepository<GithubRepository, Guid> _repositoryRepo;
         private readonly IRepository<ScanRun, Guid> _scanRunRepo;
+        private readonly IRepository<ComplianceScore, Guid> _complianceScoreRepo;
 
         public RepoGuardianAppService(
             RepoGuardianManager repoGuardianManager,
@@ -33,7 +34,8 @@ namespace FullStackProject.RepoGuardian
             RuleEngine ruleEngine,
             AiExplanationService aiExplanationService,
             IRepository<GithubRepository, Guid> repositoryRepo,
-            IRepository<ScanRun, Guid> scanRunRepo)
+            IRepository<ScanRun, Guid> scanRunRepo,
+            IRepository<ComplianceScore, Guid> complianceScoreRepo)
         {
             _repoGuardianManager = repoGuardianManager;
             _githubService = githubService;
@@ -41,6 +43,7 @@ namespace FullStackProject.RepoGuardian
             _aiExplanationService = aiExplanationService;
             _repositoryRepo = repositoryRepo;
             _scanRunRepo = scanRunRepo;
+            _complianceScoreRepo = complianceScoreRepo;
         }
 
         /// <summary>
@@ -161,13 +164,27 @@ namespace FullStackProject.RepoGuardian
                 .Select(s => (double)s.OverallScore.Value)
                 .ToList();
 
+            var filteredIds = filtered.Select(s => s.Id).ToHashSet();
+            var categoryScores = await _complianceScoreRepo.GetAllListAsync(s => filteredIds.Contains(s.ScanRunId));
+
+            var categoryAverages = categoryScores
+                .GroupBy(s => s.Category)
+                .Select(g => new CategoryAverageDto
+                {
+                    Category = g.Key.ToString(),
+                    AverageScore = Math.Round(g.Average(s => (double)s.Score), 1)
+                })
+                .OrderBy(c => c.Category)
+                .ToList();
+
             return new DashboardStatsDto
             {
                 TotalRepositories = totalRepositories,
                 TotalScans = filtered.Count,
                 AverageComplianceScore = completedScores.Count > 0
                     ? Math.Round(completedScores.Average(), 1)
-                    : null
+                    : null,
+                CategoryAverages = categoryAverages
             };
         }
 
