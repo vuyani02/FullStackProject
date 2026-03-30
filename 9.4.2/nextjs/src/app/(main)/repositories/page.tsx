@@ -15,6 +15,7 @@ const RepositoriesPage = () => {
   const [addOpen, setAddOpen] = useState(false)
   const { getRepositories } = useRepositoryActions()
   const { scanResult } = useRepositoryState()
+  const { clearScanResult } = useRepositoryActions()
 
   useEffect(() => {
     getRepositories()
@@ -40,7 +41,7 @@ const RepositoriesPage = () => {
       </div>
 
       <AddRepositoryModal open={addOpen} onClose={() => setAddOpen(false)} />
-      {scanResult && <ScanResultModal />}
+      {scanResult && <ScanResultModal scanResult={scanResult} onClose={clearScanResult} />}
     </div>
   )
 }

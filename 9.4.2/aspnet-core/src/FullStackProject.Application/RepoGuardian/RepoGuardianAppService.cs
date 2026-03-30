@@ -25,19 +25,22 @@ namespace FullStackProject.RepoGuardian
         private readonly RuleEngine _ruleEngine;
         private readonly AiExplanationService _aiExplanationService;
         private readonly IRepository<GithubRepository, Guid> _repositoryRepo;
+        private readonly IRepository<ScanRun, Guid> _scanRunRepo;
 
         public RepoGuardianAppService(
             RepoGuardianManager repoGuardianManager,
             GithubService githubService,
             RuleEngine ruleEngine,
             AiExplanationService aiExplanationService,
-            IRepository<GithubRepository, Guid> repositoryRepo)
+            IRepository<GithubRepository, Guid> repositoryRepo,
+            IRepository<ScanRun, Guid> scanRunRepo)
         {
             _repoGuardianManager = repoGuardianManager;
             _githubService = githubService;
             _ruleEngine = ruleEngine;
             _aiExplanationService = aiExplanationService;
             _repositoryRepo = repositoryRepo;
+            _scanRunRepo = scanRunRepo;
         }
 
         /// <summary>
@@ -158,6 +161,34 @@ namespace FullStackProject.RepoGuardian
             }
 
             await _repoGuardianManager.SaveRecommendationsAsync(recommendations);
+        }
+
+        /// <summary>Returns a summary of all scan runs for the current tenant, sorted latest first.</summary>
+        public async Task<List<ScanSummaryDto>> GetAllScansAsync()
+        {
+            var scanRuns = await _scanRunRepo.GetAllListAsync();
+            var repositoryIds = scanRuns.Select(s => s.RepositoryId).Distinct().ToList();
+            var repositories = await _repositoryRepo.GetAllListAsync(r => repositoryIds.Contains(r.Id));
+            var repoMap = repositories.ToDictionary(r => r.Id);
+
+            return scanRuns
+                .OrderByDescending(s => s.TriggeredAt)
+                .Select(s =>
+                {
+                    repoMap.TryGetValue(s.RepositoryId, out var repo);
+                    return new ScanSummaryDto
+                    {
+                        ScanRunId = s.Id,
+                        RepositoryId = s.RepositoryId,
+                        RepositoryName = repo?.Name ?? "Unknown",
+                        Owner = repo?.Owner ?? string.Empty,
+                        Status = s.Status.ToString(),
+                        OverallScore = s.OverallScore,
+                        TriggeredAt = s.TriggeredAt,
+                        CompletedAt = s.CompletedAt
+                    };
+                })
+                .ToList();
         }
 
         private RepositoryDto MapToRepositoryDto(GithubRepository repo) => new RepositoryDto

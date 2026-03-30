@@ -19,5 +19,8 @@ namespace FullStackProject.RepoGuardian
 
         /// <summary>Returns the current state of a scan run, including scores and rule results.</summary>
         Task<ScanResultDto> GetScanResultAsync(Guid scanRunId);
+
+        /// <summary>Returns a summary of all scan runs for the current tenant, sorted latest first.</summary>
+        Task<List<ScanSummaryDto>> GetAllScansAsync();
     }
 }
