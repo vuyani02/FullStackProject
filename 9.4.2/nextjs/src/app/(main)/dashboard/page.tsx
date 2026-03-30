@@ -107,7 +107,7 @@ const DashboardPage = () => {
           variant={scoreVariant(stats?.averageComplianceScore ?? null)}
         />
         <StatsCard
-          label="Repos Below Threshold"
+          label="Repos Below 50%"
           value={stats?.reposBelowThreshold ?? null}
           isPending={isPending}
           variant={stats?.reposBelowThreshold ? 'red' : 'green'}
