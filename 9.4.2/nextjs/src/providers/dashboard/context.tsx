@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import { IDashboardStats } from '@/Types/Dashboard/Types'
+import { IDashboardFilters, IDashboardStats } from '@/Types/Dashboard/Types'
 
 export interface IDashboardStateContext {
   isPending: boolean
@@ -9,7 +9,7 @@ export interface IDashboardStateContext {
 }
 
 export interface IDashboardActionContext {
-  getDashboardStats: () => void
+  getDashboardStats: (filters: IDashboardFilters) => void
 }
 
 export const INITIAL_STATE: IDashboardStateContext = {
