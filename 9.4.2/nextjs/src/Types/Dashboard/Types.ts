@@ -30,3 +30,13 @@ export interface IDashboardFilters {
   daysBack: number | null
   latestPerRepo: boolean
 }
+
+export interface MostRecentScanStripProps {
+  mostRecentScan: IMostRecentScan | null
+  isPending: boolean
+}
+
+export interface MostFailingRuleCardProps {
+  mostFailingRule: IMostFailingRule | null
+  isPending: boolean
+}
