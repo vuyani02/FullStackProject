@@ -6,6 +6,8 @@ import { RadarChartOutlined } from '@ant-design/icons'
 import { useDashboardState, useDashboardActions } from '@/providers/dashboard'
 import StatsCard from '@/components/dashboard/StatsCard'
 import CategoryBarChart from '@/components/dashboard/CategoryBarChart'
+import MostRecentScanStrip from '@/components/dashboard/MostRecentScanStrip'
+import MostFailingRuleCard from '@/components/dashboard/MostFailingRuleCard'
 import StartScanModal from '@/components/scans/StartScanModal'
 import ScanResultModal from '@/components/repositories/ScanResultModal'
 import { IScanResult } from '@/Types/Scan/Types'
@@ -104,10 +106,26 @@ const DashboardPage = () => {
           isPending={isPending}
           variant={scoreVariant(stats?.averageComplianceScore ?? null)}
         />
+        <StatsCard
+          label="Repos Below Threshold"
+          value={stats?.reposBelowThreshold ?? null}
+          isPending={isPending}
+          variant={stats?.reposBelowThreshold ? 'red' : 'green'}
+        />
       </div>
+
+      <MostRecentScanStrip
+        mostRecentScan={stats?.mostRecentScan ?? null}
+        isPending={isPending}
+      />
 
       <CategoryBarChart
         categoryAverages={stats?.categoryAverages ?? []}
+        isPending={isPending}
+      />
+
+      <MostFailingRuleCard
+        mostFailingRule={stats?.mostFailingRule ?? null}
         isPending={isPending}
       />
 
