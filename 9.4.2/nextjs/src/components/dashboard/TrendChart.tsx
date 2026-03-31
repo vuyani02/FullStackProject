@@ -72,7 +72,7 @@ const TrendChart = ({ trendData, isPending }: TrendChartProps) => {
 
   return (
     <div className={styles.card}>
-      <Title className={styles.title}>Compliance Trend</Title>
+      <Title className={styles.title}>Compliance Trend · Past 7 days</Title>
       <div className={styles.svgWrap}>
         <svg
           viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
