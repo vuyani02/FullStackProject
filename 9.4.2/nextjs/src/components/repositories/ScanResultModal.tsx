@@ -1,6 +1,7 @@
 'use client'
 
-import { Badge, Collapse, Modal, Progress, Table, Tag, Typography } from 'antd'
+import { useState } from 'react'
+import { Badge, Collapse, Input, Modal, Progress, Select, Table, Tag, Typography } from 'antd'
 import { IRecommendation, IRuleResult, IScanResult, ScanResultModalProps } from '@/Types/Scan/Types'
 import { useStyles } from './styles/ScanResultModal.style'
 
@@ -102,6 +103,21 @@ const ScanResultModal = ({ scanResult, onClose }: ScanResultModalProps) => {
 
 export default ScanResultModal
 
+const CATEGORY_OPTIONS = [
+  { label: 'All categories', value: '' },
+  { label: 'Documentation', value: 'Documentation' },
+  { label: 'Testing', value: 'Testing' },
+  { label: 'CiCd', value: 'CiCd' },
+  { label: 'Dependencies', value: 'Dependencies' },
+  { label: 'Security', value: 'Security' },
+]
+
+const STATUS_OPTIONS = [
+  { label: 'All statuses', value: '' },
+  { label: 'Passed', value: 'passed' },
+  { label: 'Failed', value: 'failed' },
+]
+
 const ScanResultBody = ({
   scanResult, overall, scoreBadgeClass, scoreNumClass, ruleColumns, recItems,
 }: {
@@ -113,6 +129,21 @@ const ScanResultBody = ({
   recItems: object[]
 }) => {
   const { styles } = useStyles()
+  const [search, setSearch] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState('')
+
+  const filteredRules = scanResult.ruleResults
+    .filter((r) => {
+      const matchesSearch = !search ||
+        r.ruleName.toLowerCase().includes(search.toLowerCase()) ||
+        r.ruleId.toLowerCase().includes(search.toLowerCase())
+      const matchesCategory = !categoryFilter || r.category === categoryFilter
+      const statusMatch = statusFilter === 'passed' ? r.passed : !r.passed
+      const matchesStatus = !statusFilter || statusMatch
+      return matchesSearch && matchesCategory && matchesStatus
+    })
+    .sort((a, b) => (a.passed === b.passed ? 0 : a.passed ? 1 : -1))
 
   return (
     <>
@@ -150,12 +181,33 @@ const ScanResultBody = ({
       </div>
 
       <Title className={styles.sectionTitle}>Rule Results</Title>
+      <div className={styles.rulesToolbar}>
+        <Input.Search
+          placeholder="Search rules…"
+          allowClear
+          className={styles.rulesSearch}
+          onSearch={setSearch}
+          onChange={(e) => { if (!e.target.value) setSearch('') }}
+        />
+        <Select
+          options={CATEGORY_OPTIONS}
+          value={categoryFilter}
+          onChange={setCategoryFilter}
+          className={styles.rulesFilter}
+        />
+        <Select
+          options={STATUS_OPTIONS}
+          value={statusFilter}
+          onChange={setStatusFilter}
+          className={styles.rulesFilter}
+        />
+      </div>
       <div className={styles.rulesTableWrap}>
         <Table
-          dataSource={scanResult.ruleResults}
+          dataSource={filteredRules}
           columns={ruleColumns as Parameters<typeof Table>[0]['columns']}
           rowKey="ruleId"
-          pagination={false}
+          pagination={{ defaultPageSize: 5, showSizeChanger: true, pageSizeOptions: ['5', '10'] }}
           size="small"
           scroll={{ x: 'max-content' }}
           className={styles.rulesTable}
