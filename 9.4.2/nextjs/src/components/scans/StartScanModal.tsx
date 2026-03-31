@@ -46,7 +46,7 @@ const StartScanModal = ({ open, onClose, onScanComplete, onScanStart, onScanEnd 
           setIsScanning(false)
           return
         }
-        const addRes = await axios.post('/api/repositories', { githubUrl: newUrl.trim() })
+        const addRes = await axios.post('/api/repositories', { githubUrl: newUrl.trim(), allowExisting: true })
         repositoryId = addRes.data.id
       }
 
