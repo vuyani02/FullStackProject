@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Avatar, Button, Drawer } from 'antd'
 import { MenuOutlined, CloseOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import axios from 'axios'
-import { useProfileState } from '@/providers/profile'
+import { useProfileActions, useProfileState } from '@/providers/profile'
 import { useStyles } from './styles/AppNavbar.style'
 
 const ShieldIcon = () => {
@@ -36,7 +36,12 @@ const AppNavbar = () => {
   const router = useRouter()
   const [drawerOpen, setDrawerOpen] = useState(false)
   const { profile } = useProfileState()
+  const { getProfile } = useProfileActions()
   const teamInitial = profile?.teamName?.charAt(0).toUpperCase() ?? '?'
+
+  useEffect(() => {
+    if (!profile) getProfile()
+  }, [])
 
   const handleLogout = async () => {
     await axios.post('/api/auth/logout')
