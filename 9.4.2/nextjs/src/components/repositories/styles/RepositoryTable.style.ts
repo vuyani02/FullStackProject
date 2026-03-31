@@ -29,10 +29,13 @@ export const useStyles = createStyles(({ css }) => ({
     display: flex;
     gap: 12px;
     margin-bottom: 16px;
+    margin-top: 16px;
+    margin-right: 16px;
     flex-wrap: wrap;
 
     @media (max-width: 768px) {
       flex-direction: column;
+      margin-right: 0;
     }
   `,
   searchInput: css`
