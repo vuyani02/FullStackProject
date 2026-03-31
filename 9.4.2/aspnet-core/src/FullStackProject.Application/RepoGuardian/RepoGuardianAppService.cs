@@ -189,7 +189,7 @@ namespace FullStackProject.RepoGuardian
             return new DashboardStatsDto
             {
                 TotalRepositories = totalRepositories,
-                TotalScans = filtered.Count,
+                TotalScans = allScanRuns.Count,
                 AverageComplianceScore = completedScores.Count > 0
                     ? Math.Round(completedScores.Average(), 1)
                     : null,
