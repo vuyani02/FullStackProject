@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { Skeleton, Typography } from 'antd'
 import { ClockCircleOutlined } from '@ant-design/icons'
 import { MostRecentScanStripProps } from '@/Types/Dashboard/Types'
@@ -7,8 +8,8 @@ import { useStyles } from './styles/MostRecentScanStrip.style'
 
 const { Text } = Typography
 
-const formatRelativeTime = (isoDate: string): string => {
-  const diff = Date.now() - new Date(isoDate).getTime()
+const formatRelativeTime = (isoDate: string, now: number): string => {
+  const diff = now - new Date(isoDate).getTime()
   const minutes = Math.floor(diff / 60_000)
   if (minutes < 1) return 'just now'
   if (minutes < 60) return `${minutes}m ago`
@@ -25,32 +26,42 @@ const scoreVariantKey = (score: number | null): 'scoreGreen' | 'scoreAmber' | 's
   return 'scoreRed'
 }
 
+const renderScore = (score: number | null) =>
+  score !== null ? `${score}%` : 'N/A'
+
 const MostRecentScanStrip = ({ mostRecentScan, isPending }: MostRecentScanStripProps) => {
   const { styles } = useStyles()
+  const [now, setNow] = useState(Date.now())
+
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 60_000)
+    return () => clearInterval(interval)
+  }, [])
+
+  const renderContent = () => {
+    if (isPending) return <Skeleton.Input active className={styles.skeleton} />
+    if (mostRecentScan === null || mostRecentScan === undefined) return <Text className={styles.empty}>No scans yet.</Text>
+    return (
+      <>
+        <Text className={styles.repoName}>
+          {mostRecentScan.owner}/{mostRecentScan.repositoryName}
+        </Text>
+        <span className={styles.dot}>•</span>
+        <span className={`${styles.scoreBadge} ${styles[scoreVariantKey(mostRecentScan.overallScore)]}`}>
+          {renderScore(mostRecentScan.overallScore)}
+        </span>
+        <span className={styles.dot}>•</span>
+        <Text className={styles.time}>{formatRelativeTime(mostRecentScan.triggeredAt, now)}</Text>
+      </>
+    )
+  }
 
   return (
     <div className={styles.strip}>
       <Text className={styles.label}>
         <ClockCircleOutlined /> Most Recent Scan
       </Text>
-
-      {isPending ? (
-        <Skeleton.Input active className={styles.skeleton} />
-      ) : !mostRecentScan ? (
-        <Text className={styles.empty}>No scans yet.</Text>
-      ) : (
-        <>
-          <Text className={styles.repoName}>
-            {mostRecentScan.owner}/{mostRecentScan.repositoryName}
-          </Text>
-          <span className={styles.dot}>•</span>
-          <span className={`${styles.scoreBadge} ${styles[scoreVariantKey(mostRecentScan.overallScore)]}`}>
-            {mostRecentScan.overallScore !== null ? `${mostRecentScan.overallScore}%` : 'N/A'}
-          </span>
-          <span className={styles.dot}>•</span>
-          <Text className={styles.time}>{formatRelativeTime(mostRecentScan.triggeredAt)}</Text>
-        </>
-      )}
+      {renderContent()}
     </div>
   )
 }
