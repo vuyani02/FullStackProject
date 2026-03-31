@@ -164,8 +164,8 @@ namespace FullStackProject.RepoGuardian
             var repositories = await _repositoryRepo.GetAllListAsync();
             var repoMap = repositories.ToDictionary(r => r.Id);
 
-            var filtered = ApplyDateFilter(allScanRuns, request.DaysBack);
-            filtered = ApplyScopeFilter(filtered, request.LatestPerRepo);
+            var dateFiltered = ApplyDateFilter(allScanRuns, request.DaysBack);
+            var filtered = ApplyScopeFilter(dateFiltered, request.LatestPerRepo);
 
             var completedScores = filtered
                 .Where(s => s.Status == ScanRunStatus.Completed && s.OverallScore.HasValue)
@@ -189,7 +189,7 @@ namespace FullStackProject.RepoGuardian
             return new DashboardStatsDto
             {
                 TotalRepositories = totalRepositories,
-                TotalScans = allScanRuns.Count,
+                TotalScans = dateFiltered.Count,
                 AverageComplianceScore = completedScores.Count > 0
                     ? Math.Round(completedScores.Average(), 1)
                     : null,
