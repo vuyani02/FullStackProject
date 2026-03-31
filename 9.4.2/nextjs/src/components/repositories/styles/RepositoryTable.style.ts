@@ -29,8 +29,7 @@ export const useStyles = createStyles(({ css }) => ({
     display: flex;
     gap: 12px;
     margin-bottom: 16px;
-    margin-top: 16px;
-    margin-right: 16px;
+    padding: 16px 16px 0 16px;
     flex-wrap: wrap;
 
     @media (max-width: 768px) {
