@@ -7,7 +7,7 @@ import { useStyles } from './styles/MyProfileTab.style'
 const { Title, Text } = Typography
 
 interface MyProfileTabProps {
-  user: IUserProfile
+  user: IUserProfile | undefined
   isPending: boolean
 }
 
