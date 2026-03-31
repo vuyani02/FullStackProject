@@ -19,4 +19,4 @@ export const INITIAL_STATE: IProfileStateContext = {
 }
 
 export const ProfileStateContext = createContext<IProfileStateContext>(INITIAL_STATE)
-export const ProfileActionContext = createContext<IProfileActionContext>(undefined)
+export const ProfileActionContext = createContext<IProfileActionContext>(undefined as unknown as IProfileActionContext)
