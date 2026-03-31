@@ -32,7 +32,10 @@ const RepositoryTable = () => {
         <div>
           <span
             className={styles.repoLink}
+            role="button"
+            tabIndex={0}
             onClick={() => router.push(`/repositories/${row.id}`)}
+            onKeyDown={(e) => e.key === 'Enter' && router.push(`/repositories/${row.id}`)}
           >
             {row.name}
           </span>
@@ -60,7 +63,7 @@ const RepositoryTable = () => {
           size="small"
           icon={<RadarChartOutlined spin={isScanPending && scanningRepositoryId === row.id} />}
           disabled={isScanPending && scanningRepositoryId !== row.id}
-          onClick={() => startScan(row.id)}
+          onClick={(e) => { e.stopPropagation(); startScan(row.id) }}
           className={styles.scanBtn}
         >
           Scan
@@ -86,8 +89,12 @@ const RepositoryTable = () => {
         columns={columns}
         rowKey="id"
         loading={isPending}
-        pagination={{ defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: ['5', '10', '20', '50'] }}
+        pagination={{ defaultPageSize: 5, showSizeChanger: true, pageSizeOptions: ['5', '10', '20', '50'] }}
         locale={{ emptyText: search ? 'No repositories match your search.' : 'No repositories yet. Add one to get started.' }}
+        onRow={(row) => ({
+          onClick: () => router.push(`/repositories/${row.id}`),
+          className: styles.clickableRow,
+        })}
       />
     </>
   )

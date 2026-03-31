@@ -4,6 +4,7 @@ import { use, useEffect, useState } from 'react'
 import { Button } from 'antd'
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import { useRouter } from 'next/navigation'
+import axios from 'axios'
 import { useRepositoryDetailState, useRepositoryDetailActions } from '@/providers/repositoryDetail'
 import RepoDetailHeader from '@/components/repositoryDetail/RepoDetailHeader'
 import RepoTrendChart from '@/components/repositoryDetail/RepoTrendChart'
@@ -11,7 +12,6 @@ import RepoScansTable from '@/components/repositoryDetail/RepoScansTable'
 import ScanResultModal from '@/components/repositories/ScanResultModal'
 import { IScanResult } from '@/Types/Scan/Types'
 import { useStyles } from './style'
-import axios from 'axios'
 
 const RepositoryDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = use(params)
@@ -20,6 +20,7 @@ const RepositoryDetailPage = ({ params }: { params: Promise<{ id: string }> }) =
   const { detail, isPending } = useRepositoryDetailState()
   const { getRepositoryDetail } = useRepositoryDetailActions()
   const [viewedResult, setViewedResult] = useState<IScanResult | null>(null)
+  const [isScanning, setIsScanning] = useState(false)
 
   useEffect(() => {
     getRepositoryDetail(id)
@@ -30,6 +31,19 @@ const RepositoryDetailPage = ({ params }: { params: Promise<{ id: string }> }) =
     const res = await axios.get(`/api/scans/${scanRunId}`)
     setViewedResult(res.data)
   }
+
+  const handleScan = async () => {
+    setIsScanning(true)
+    try {
+      const res = await axios.post('/api/repositories/scan', { repositoryId: id })
+      setViewedResult(res.data)
+      getRepositoryDetail(id)
+    } finally {
+      setIsScanning(false)
+    }
+  }
+
+  const lastScanScore = detail?.scans?.find((s) => s.status === 'Completed')?.overallScore ?? null
 
   return (
     <div className={styles.content}>
@@ -42,7 +56,13 @@ const RepositoryDetailPage = ({ params }: { params: Promise<{ id: string }> }) =
         Back to Repositories
       </Button>
 
-      <RepoDetailHeader repository={detail?.repository} isPending={isPending} />
+      <RepoDetailHeader
+        repository={detail?.repository}
+        lastScanScore={lastScanScore}
+        isPending={isPending}
+        onScan={handleScan}
+        isScanning={isScanning}
+      />
 
       <RepoTrendChart scans={detail?.scans ?? []} isPending={isPending} />
 

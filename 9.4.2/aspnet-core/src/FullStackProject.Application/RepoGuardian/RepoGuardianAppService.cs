@@ -50,8 +50,8 @@ namespace FullStackProject.RepoGuardian
         }
 
         /// <summary>
-        /// Registers a GitHub repository for the current user.
-        /// If the same URL is already registered by this user, returns the existing record.
+        /// Registers a GitHub repository for the current tenant.
+        /// Throws a UserFriendlyException if the URL is already registered, unless AllowExisting is true.
         /// </summary>
         public async Task<RepositoryDto> AddRepositoryAsync(AddRepositoryRequest request)
         {
@@ -63,7 +63,12 @@ namespace FullStackProject.RepoGuardian
                 r => r.GithubUrl.ToLower() == normalized && r.UserId == userId);
 
             if (existing != null)
+            {
+                if (!request.AllowExisting)
+                    throw new Abp.UI.UserFriendlyException("This repository has already been added.");
+
                 return MapToRepositoryDto(existing);
+            }
 
             var repo = await _repositoryRepo.InsertAsync(new GithubRepository
             {

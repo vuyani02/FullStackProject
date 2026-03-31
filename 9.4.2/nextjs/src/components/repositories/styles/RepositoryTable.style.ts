@@ -29,24 +29,32 @@ export const useStyles = createStyles(({ css }) => ({
     display: flex;
     gap: 12px;
     margin-bottom: 16px;
+    padding: 16px 16px 0 16px;
     flex-wrap: wrap;
 
     @media (max-width: 768px) {
       flex-direction: column;
+      margin-right: 0;
     }
   `,
   searchInput: css`
-    flex: 1;
-    min-width: 180px;
+    width: 50%;
+    min-width: 200px;
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
   `,
   repoLink: css`
     font-weight: 600;
     font-size: 14px;
-    color: #4f46e5 !important;
+    color: #111827 !important;
+  `,
+  clickableRow: css`
     cursor: pointer;
 
-    &:hover {
-      text-decoration: underline;
+    &:hover td {
+      background: #f9fafb !important;
     }
   `,
 }))

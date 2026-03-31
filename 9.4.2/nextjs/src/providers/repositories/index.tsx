@@ -23,9 +23,14 @@ export const RepositoryProvider = ({ children }: { children: React.ReactNode }) 
 
   const addRepository = async (githubUrl: string) => {
     dispatch(addRepositoryPending())
-    await axios.post('/api/repositories', { githubUrl })
-      .then((res) => dispatch(addRepositorySuccess(res.data)))
-      .catch(() => dispatch(addRepositoryError()))
+    try {
+      const res = await axios.post('/api/repositories', { githubUrl })
+      dispatch(addRepositorySuccess(res.data))
+    } catch (err: unknown) {
+      dispatch(addRepositoryError())
+      // Re-throw so the caller can surface the error message
+      throw err
+    }
   }
 
   const startScan = async (repositoryId: string) => {
