@@ -1,6 +1,6 @@
 using System;
 
-namespace FullStackProject.Profile.Dto
+namespace FullStackProject.UserProfile.Dto
 {
     /// <summary>A single member of the current tenant's team.</summary>
     public class TeamMemberDto

@@ -1,4 +1,4 @@
-namespace FullStackProject.Profile.Dto
+namespace FullStackProject.UserProfile.Dto
 {
     /// <summary>Basic details about the currently authenticated user.</summary>
     public class UserProfileDto

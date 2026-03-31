@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Abp.Authorization;
 using Abp.Domain.Repositories;
 using FullStackProject.Authorization.Users;
-using FullStackProject.Profile.Dto;
+using FullStackProject.UserProfile.Dto;
 
-namespace FullStackProject.Profile
+namespace FullStackProject.UserProfile
 {
     /// <summary>
     /// Returns profile information for the currently authenticated user and their team.

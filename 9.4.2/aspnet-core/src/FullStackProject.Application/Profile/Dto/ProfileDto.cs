@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace FullStackProject.Profile.Dto
+namespace FullStackProject.UserProfile.Dto
 {
     /// <summary>Full profile response: current user info, team name, and all team members.</summary>
     public class ProfileDto

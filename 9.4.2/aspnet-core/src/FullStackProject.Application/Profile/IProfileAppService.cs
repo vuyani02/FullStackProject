@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
 using Abp.Application.Services;
-using FullStackProject.Profile.Dto;
+using FullStackProject.UserProfile.Dto;
 
-namespace FullStackProject.Profile
+namespace FullStackProject.UserProfile
 {
     public interface IProfileAppService : IApplicationService
     {
