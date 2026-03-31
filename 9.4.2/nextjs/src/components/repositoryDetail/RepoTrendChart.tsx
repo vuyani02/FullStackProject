@@ -52,19 +52,31 @@ const RepoTrendChart = ({ scans, isPending }: RepoTrendChartProps) => {
   }
 
   const n = completed.length
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+  const formatDate = (iso: string) => {
+    const d = new Date(iso)
+    return `${d.getDate()} ${MONTHS[d.getMonth()]}`
+  }
+
   const points = completed.map((s, i) => ({
     x: toX(i, n),
     y: toY(s.overallScore as number),
     scan: s,
-    label: `#${n - i}`,
+    label: formatDate(s.triggeredAt),
   }))
 
-  const polylinePoints = points.map((p) => `${p.x},${p.y}`).join(' ')
-  const areaPoints = [
-    ...points.map((p) => `${p.x},${p.y}`),
-    `${points[n - 1].x},${PAD.top + PLOT_H}`,
-    `${points[0].x},${PAD.top + PLOT_H}`,
-  ].join(' ')
+  const smoothPath = (pts: { x: number; y: number }[]) => {
+    if (pts.length === 1) return `M ${pts[0].x},${pts[0].y}`
+    return pts.reduce((acc, pt, i) => {
+      if (i === 0) return `M ${pt.x},${pt.y}`
+      const prev = pts[i - 1]
+      const cpX = (prev.x + pt.x) / 2
+      return `${acc} C ${cpX},${prev.y} ${cpX},${pt.y} ${pt.x},${pt.y}`
+    }, '')
+  }
+
+  const linePath = smoothPath(points)
+  const areaPath = `${linePath} L ${points[n - 1].x},${PAD.top + PLOT_H} L ${points[0].x},${PAD.top + PLOT_H} Z`
 
   return (
     <div className={styles.card}>
@@ -104,8 +116,8 @@ const RepoTrendChart = ({ scans, isPending }: RepoTrendChartProps) => {
             </text>
           ))}
 
-          <polygon points={areaPoints} className={styles.trendArea} />
-          <polyline points={polylinePoints} className={styles.trendLine} />
+          <path d={areaPath} className={styles.trendArea} />
+          <path d={linePath} className={styles.trendLine} />
 
           {points.map((p) => (
             <circle key={p.scan.scanRunId} cx={p.x} cy={p.y} r={4} className={styles.dot} />
