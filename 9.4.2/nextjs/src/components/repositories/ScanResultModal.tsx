@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Badge, Collapse, Input, Modal, Progress, Select, Table, Tag, Typography } from 'antd'
+import { BulbOutlined, CloseCircleOutlined, ToolOutlined } from '@ant-design/icons'
 import { IRecommendation, IRuleResult, IScanResult, ScanResultModalProps } from '@/Types/Scan/Types'
 import { useStyles } from './styles/ScanResultModal.style'
 
@@ -77,7 +78,14 @@ const ScanResultModal = ({ scanResult, onClose }: ScanResultModalProps) => {
 
   const recItems = scanResult.recommendations.map((rec: IRecommendation, i) => ({
     key: String(i),
-    label: <span className={styles.recCollapseLabel}>{ruleNameMap[rec.ruleId] ?? rec.ruleId}</span>,
+    label: (
+      <span className={styles.recCollapseLabel}>
+        {ruleNameMap[rec.ruleId] ?? rec.ruleId}
+        <span className={styles.recFailBadge}>
+          <CloseCircleOutlined /> Failed
+        </span>
+      </span>
+    ),
     children: <RecommendationBody rec={rec} />,
   }))
 
@@ -217,7 +225,10 @@ const ScanResultBody = ({
       {recItems.length > 0 && (
         <>
           <Title className={styles.sectionTitle}>AI Recommendations</Title>
-          <Collapse items={recItems as Parameters<typeof Collapse>[0]['items']} size="small" />
+          <Collapse
+            items={recItems as Parameters<typeof Collapse>[0]['items']}
+            className={styles.recCollapse}
+          />
         </>
       )}
     </>
@@ -226,14 +237,39 @@ const ScanResultBody = ({
 
 const RecommendationBody = ({ rec }: { rec: IRecommendation }) => {
   const { styles } = useStyles()
+
+  const sections = [
+    {
+      label: 'Issue',
+      text: rec.issueDescription,
+      icon: <CloseCircleOutlined style={{ color: '#ef4444', fontSize: 14 }} />,
+      iconClass: `${styles.recIconWrap} ${styles.recIconIssue}`,
+    },
+    {
+      label: 'Explanation',
+      text: rec.explanation,
+      icon: <BulbOutlined style={{ color: '#3b82f6', fontSize: 14 }} />,
+      iconClass: `${styles.recIconWrap} ${styles.recIconExplanation}`,
+    },
+    {
+      label: 'Suggested Fix',
+      text: rec.suggestedFix,
+      icon: <ToolOutlined style={{ color: '#10b981', fontSize: 14 }} />,
+      iconClass: `${styles.recIconWrap} ${styles.recIconFix}`,
+    },
+  ]
+
   return (
-    <div className={styles.recommendationCard}>
-      <div className={styles.recLabel}>Issue</div>
-      <Paragraph className={styles.recText}>{rec.issueDescription}</Paragraph>
-      <div className={styles.recLabel}>Explanation</div>
-      <Paragraph className={styles.recText}>{rec.explanation}</Paragraph>
-      <div className={styles.recLabel}>Suggested Fix</div>
-      <Paragraph className={styles.recText}>{rec.suggestedFix}</Paragraph>
-    </div>
+    <>
+      {sections.map((s) => (
+        <div key={s.label} className={styles.recSection}>
+          <div className={s.iconClass}>{s.icon}</div>
+          <div className={styles.recSectionContent}>
+            <Text className={styles.recSectionLabel}>{s.label}</Text>
+            <Paragraph className={styles.recSectionText}>{s.text}</Paragraph>
+          </div>
+        </div>
+      ))}
+    </>
   )
 }
