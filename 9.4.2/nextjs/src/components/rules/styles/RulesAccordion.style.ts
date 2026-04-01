@@ -1,20 +1,31 @@
 import { createStyles } from 'antd-style'
 
 export const useStyles = createStyles(({ css }) => ({
-  section: css`
-    margin-bottom: 32px;
-  `,
-  sectionHeader: css`
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-  `,
-  sectionTitle: css`
-    font-size: 16px !important;
-    font-weight: 700 !important;
-    color: #111827 !important;
-    margin: 0 !important;
+  outerCollapse: css`
+    border: none !important;
+    background: transparent !important;
+
+    & > .ant-collapse-item {
+      border: 1px solid #e5e7eb !important;
+      border-radius: 10px !important;
+      margin-bottom: 8px !important;
+      overflow: hidden;
+    }
+
+    & > .ant-collapse-item:last-child {
+      border-radius: 10px !important;
+    }
+
+    & > .ant-collapse-item > .ant-collapse-header {
+      background: #f9fafb !important;
+      border-left: 4px solid #4f46e5 !important;
+      padding: 12px 16px !important;
+      align-items: center !important;
+    }
+
+    & > .ant-collapse-item > .ant-collapse-content {
+      border-top: 1px solid #e5e7eb !important;
+    }
   `,
   sectionCount: css`
     font-size: 13px !important;

@@ -93,7 +93,13 @@ const RulesAccordion = ({ rules, activeOnly, isTogglePending, onToggle }: RulesA
     ),
   }))
 
-  return <Collapse items={categoryPanels} defaultActiveKey={Object.keys(byCategory)} />
+  return (
+    <Collapse
+      items={categoryPanels}
+      defaultActiveKey={Object.keys(byCategory)}
+      className={styles.outerCollapse}
+    />
+  )
 }
 
 export default RulesAccordion
