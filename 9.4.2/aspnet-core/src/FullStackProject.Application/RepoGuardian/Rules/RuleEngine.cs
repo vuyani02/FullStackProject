@@ -94,8 +94,8 @@ namespace FullStackProject.RepoGuardian.Rules
                 // ── Testing (extended) ────────────────────────────────────────
                 Check(scanRunId, "TEST_002", "Test coverage configuration", RuleCategory.Testing,
                     paths.Any(p => p.Contains("codecov.yml") || p.Contains(".coveragerc")
-                                   || p.Contains("jest.config.") || p.Contains("coverage.xml")
-                                   || p.Contains(".nycrc") || p.Contains("coverlet"))),
+                                   || p.Contains("jest.config.") || p.Contains(".nycrc")
+                                   || p.Contains("coverlet"))),
 
                 // ── CI/CD (extended) ──────────────────────────────────────────
                 Check(scanRunId, "CICD_003", "Containerisation (Docker)", RuleCategory.CiCd,
