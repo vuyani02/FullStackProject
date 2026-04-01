@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Abp.Configuration;
+using Abp.Domain.Repositories;
 using Abp.Domain.Uow;
 using Abp.UI;
 using Abp.Zero.Configuration;
@@ -14,26 +15,39 @@ namespace FullStackProject.Authorization.Accounts
     {
         private readonly UserRegistrationManager _userRegistrationManager;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
+        private readonly IRepository<Tenant> _tenantRepository;
 
         public AccountAppService(
             UserRegistrationManager userRegistrationManager,
-            IUnitOfWorkManager unitOfWorkManager)
+            IUnitOfWorkManager unitOfWorkManager,
+            IRepository<Tenant> tenantRepository)
         {
             _userRegistrationManager = userRegistrationManager;
             _unitOfWorkManager = unitOfWorkManager;
+            _tenantRepository = tenantRepository;
         }
 
-        /// <summary>Checks whether a tenancy name is available and active.</summary>
+        /// <summary>
+        /// Checks whether a tenancy name is available and active.
+        /// Uses a case-insensitive match so "Default" and "default" resolve to the same tenant.
+        /// </summary>
         public async Task<IsTenantAvailableOutput> IsTenantAvailable(IsTenantAvailableInput input)
         {
-            var tenant = await TenantManager.FindByTenancyNameAsync(input.TenancyName);
-            if (tenant == null)
-                return new IsTenantAvailableOutput(TenantAvailabilityState.NotFound);
+            var normalised = input.TenancyName.ToLowerInvariant();
 
-            if (!tenant.IsActive)
-                return new IsTenantAvailableOutput(TenantAvailabilityState.InActive);
+            using (_unitOfWorkManager.Current.SetTenantId(null))
+            {
+                var tenant = await _tenantRepository.FirstOrDefaultAsync(
+                    t => t.TenancyName.ToLower() == normalised);
 
-            return new IsTenantAvailableOutput(TenantAvailabilityState.Available, tenant.Id);
+                if (tenant == null)
+                    return new IsTenantAvailableOutput(TenantAvailabilityState.NotFound);
+
+                if (!tenant.IsActive)
+                    return new IsTenantAvailableOutput(TenantAvailabilityState.InActive);
+
+                return new IsTenantAvailableOutput(TenantAvailabilityState.Available, tenant.Id);
+            }
         }
 
         /// <summary>
