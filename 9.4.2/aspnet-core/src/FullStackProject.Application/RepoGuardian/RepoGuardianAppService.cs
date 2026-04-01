@@ -6,6 +6,7 @@ using Abp.Authorization;
 using Abp.Domain.Repositories;
 using Abp.Runtime.Session;
 using Abp.UI;
+using FullStackProject.Authorization.Roles;
 using FullStackProject.Domains.RepoGuardian;
 using FullStackProject.RepoGuardian.AI;
 using FullStackProject.RepoGuardian.Dto;
@@ -420,9 +421,13 @@ namespace FullStackProject.RepoGuardian
                 .ToList();
         }
 
-        /// <summary>Activates or deactivates a compliance rule for the current tenant.</summary>
+        /// <summary>Activates or deactivates a compliance rule for the current tenant. Caller must be an admin.</summary>
         public async Task ToggleRuleAsync(ToggleRuleRequest request)
         {
+            var caller = await GetCurrentUserAsync();
+            if (!await UserManager.IsInRoleAsync(caller, StaticRoleNames.Tenants.Admin))
+                throw new AbpAuthorizationException("Only team admins can change active rules.");
+
             var tenantId = AbpSession.GetTenantId();
 
             if (request.Activate)
