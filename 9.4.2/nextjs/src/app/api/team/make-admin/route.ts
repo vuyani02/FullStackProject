@@ -7,8 +7,7 @@ export const POST = async (req: NextRequest) => {
   const { userId } = await req.json()
   try {
     await abpApiWithToken(accessToken).post(
-      '/api/services/app/Team/MakeAdmin',
-      { userId }
+      `/api/services/app/Team/MakeAdmin?userId=${userId}`
     )
     return NextResponse.json({ success: true })
   } catch (err: unknown) {
