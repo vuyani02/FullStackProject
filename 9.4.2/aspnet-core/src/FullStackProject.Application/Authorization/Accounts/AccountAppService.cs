@@ -45,6 +45,10 @@ namespace FullStackProject.Authorization.Accounts
         {
             var tenantId = await ResolveOrCreateTenantAsync(input.TeamAction, input.TeamName);
 
+            // AbpSession.Use overrides the session claims for this scope, which is required
+            // because UserRegistrationManager.CheckForTenant reads AbpSession.TenantId directly.
+            // SetTenantId on the UoW only changes the DB filter — it does not affect AbpSession.
+            using (AbpSession.Use(tenantId, null))
             using (_unitOfWorkManager.Current.SetTenantId(tenantId))
             {
                 var user = await _userRegistrationManager.RegisterAsync(
