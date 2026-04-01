@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { Badge, Divider, Skeleton, Typography } from 'antd'
 import { useRulesState, useRulesActions } from '@/providers/rules'
+import { useProfileState } from '@/providers/profile'
 import RulesAccordion from '@/components/rules/RulesAccordion'
 import { useStyles } from './style'
 
@@ -12,6 +13,9 @@ const RulesPage = () => {
   const { styles } = useStyles()
   const { rules, isPending, isTogglePending } = useRulesState()
   const { getRules, toggleRule } = useRulesActions()
+  const { profile } = useProfileState()
+
+  const isAdmin = profile?.currentUserIsAdmin ?? false
 
   useEffect(() => {
     getRules()
@@ -44,6 +48,7 @@ const RulesPage = () => {
             rules={rules}
             activeOnly
             isTogglePending={isTogglePending}
+            isAdmin={isAdmin}
             onToggle={toggleRule}
           />
 
@@ -57,6 +62,7 @@ const RulesPage = () => {
             rules={rules}
             activeOnly={false}
             isTogglePending={isTogglePending}
+            isAdmin={isAdmin}
             onToggle={toggleRule}
           />
         </>
