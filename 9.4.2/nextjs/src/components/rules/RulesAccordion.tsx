@@ -18,10 +18,11 @@ interface RulesAccordionProps {
   rules: IRuleDefinition[]
   activeOnly: boolean
   isTogglePending: boolean
+  isAdmin: boolean
   onToggle: (ruleId: string, activate: boolean) => Promise<void>
 }
 
-const RulesAccordion = ({ rules, activeOnly, isTogglePending, onToggle }: RulesAccordionProps) => {
+const RulesAccordion = ({ rules, activeOnly, isTogglePending, isAdmin, onToggle }: RulesAccordionProps) => {
   const { styles } = useStyles()
 
   const filtered = rules.filter((r) => r.isActive === activeOnly)
@@ -60,17 +61,19 @@ const RulesAccordion = ({ rules, activeOnly, isTogglePending, onToggle }: RulesA
                   {rule.ruleId}
                 </Tag>
               </div>
-              <Spin spinning={isTogglePending} size="small">
-                <Switch
-                  checked={rule.isActive}
-                  size="small"
-                  className={styles.toggle}
-                  onClick={(_, e) => {
-                    e.stopPropagation()
-                    onToggle(rule.ruleId, !rule.isActive)
-                  }}
-                />
-              </Spin>
+              {isAdmin && (
+                <Spin spinning={isTogglePending} size="small">
+                  <Switch
+                    checked={rule.isActive}
+                    size="small"
+                    className={styles.toggle}
+                    onClick={(_, e) => {
+                      e.stopPropagation()
+                      onToggle(rule.ruleId, !rule.isActive)
+                    }}
+                  />
+                </Spin>
+              )}
             </div>
           ),
           children: (
