@@ -13,6 +13,8 @@ namespace FullStackProject.Team
     {
         private readonly IRepository<User, long> _userRepo;
 
+        public RoleManager RoleManager { get; set; }
+
         public TeamAppService(IRepository<User, long> userRepo)
         {
             _userRepo = userRepo;
@@ -33,6 +35,11 @@ namespace FullStackProject.Team
             var target = await GetTenantUserOrThrowAsync(userId);
             if (await UserManager.IsInRoleAsync(target, StaticRoleNames.Tenants.Admin))
                 return;
+
+            // Tenants created before the role-feature was introduced may not have the Admin role row yet.
+            var adminRole = await RoleManager.FindByNameAsync(StaticRoleNames.Tenants.Admin);
+            if (adminRole == null)
+                CheckErrors(await RoleManager.CreateAsync(new Role(AbpSession.TenantId, StaticRoleNames.Tenants.Admin, StaticRoleNames.Tenants.Admin) { IsStatic = true }));
 
             CheckErrors(await UserManager.AddToRoleAsync(target, StaticRoleNames.Tenants.Admin));
         }
