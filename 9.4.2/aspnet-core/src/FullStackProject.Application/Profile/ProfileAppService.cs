@@ -42,6 +42,7 @@ namespace FullStackProject.UserProfile
                     EmailAddress = currentUser.EmailAddress
                 },
                 TeamName = tenant.Name,
+                CurrentUserIsAdmin = adminIds.Contains(currentUser.Id),
                 TeamMembers = allUsers
                     .Select(u => new TeamMemberDto
                     {
