@@ -10,18 +10,17 @@ test.describe('Rules', () => {
   })
 
   test('renders active and deactivated rule sections', async ({ page }) => {
-    await expect(page.getByText(/Active Rules/)).toBeVisible()
-    await expect(page.getByText(/Deactivated Rules/)).toBeVisible()
+    await expect(page.getByText(/Active Rules \(\d+\)/)).toBeVisible()
+    await expect(page.getByText(/Deactivated Rules \(\d+\)/)).toBeVisible()
   })
 
   test('renders rule category accordions', async ({ page }) => {
-    await expect(page.getByText('Documentation')).toBeVisible()
-    await expect(page.getByText('Testing')).toBeVisible()
-    await expect(page.getByText('Security')).toBeVisible()
+    await expect(page.getByRole('button', { name: /Documentation/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /Testing/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /Security — \d+ rules?/ }).first()).toBeVisible()
   })
 
   test('expanding a rule panel shows explanation fields', async ({ page }) => {
-    // Click the first inner rule panel to expand it
     await page.getByText('README exists').click()
     await expect(page.getByText('What is it?')).toBeVisible()
     await expect(page.getByText('Why it matters')).toBeVisible()
@@ -29,7 +28,6 @@ test.describe('Rules', () => {
   })
 
   test('admin sees toggle switches', async ({ page }) => {
-    // At least one switch should be visible for an admin user
     await expect(page.locator('.ant-switch').first()).toBeVisible()
   })
 })

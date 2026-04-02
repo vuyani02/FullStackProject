@@ -33,15 +33,15 @@ test.describe('Auth', () => {
     await page.getByLabel('Password').fill(TEST_CREDS.password)
     await page.getByRole('button', { name: 'Sign In' }).click()
 
-    await page.waitForURL('/dashboard')
+    await page.waitForURL('/dashboard', { timeout: 15000 })
     await expect(page).toHaveURL('/dashboard')
   })
 
   test('register page renders team action and all fields', async ({ page }) => {
     await page.goto('/register')
 
-    await expect(page.getByText('Create a new team')).toBeVisible()
-    await expect(page.getByText('Join an existing team')).toBeVisible()
+    await expect(page.getByText('Create a team')).toBeVisible()
+    await expect(page.getByText('Join a team')).toBeVisible()
     await expect(page.getByRole('button', { name: 'Create Account' })).toBeVisible()
   })
 

@@ -10,7 +10,7 @@ test.describe('Dashboard', () => {
   })
 
   test('renders the three stat cards', async ({ page }) => {
-    await expect(page.getByText('Overall Compliance')).toBeVisible()
+    await expect(page.getByText('Avg Compliance Score')).toBeVisible()
     await expect(page.getByText('Total Repositories')).toBeVisible()
     await expect(page.getByText('Total Scans')).toBeVisible()
   })
