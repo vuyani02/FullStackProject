@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      API_URL: http://localhost:44311
+      TEST_TEAM_NAME: ${{ secrets.TEST_TEAM_NAME }}
+      TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── Backend ────────────────────────────────────────────────────────────
+      - name: Start backend (ABP + PostgreSQL)
+        working-directory: 9.4.2/aspnet-core/docker/ng
+        env:
+          Gemini__ApiKey: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          docker compose up -d --build
+          # Wait for the ABP host to be ready (migrations run inside entrypoint)
+          echo "Waiting for backend..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:44311/api/services/app/Account/IsTenantAvailable \
+              -X POST -H "Content-Type: application/json" \
+              -d '{"tenancyName":"test"}' > /dev/null 2>&1; then
+              echo "Backend is up"
+              break
+            fi
+            echo "Attempt $i/30 — waiting 5s..."
+            sleep 5
+          done
+
+      # ── Frontend ───────────────────────────────────────────────────────────
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: 9.4.2/nextjs/package-lock.json
+
+      - name: Install dependencies
+        working-directory: 9.4.2/nextjs
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: 9.4.2/nextjs
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Run Playwright tests
+        working-directory: 9.4.2/nextjs
+        run: npm test
+
+      # ── Artifacts ──────────────────────────────────────────────────────────
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: 9.4.2/nextjs/playwright-report/
+          retention-days: 7
