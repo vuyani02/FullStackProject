@@ -2,6 +2,10 @@
 
 Next.js 16 frontend for RepoGuardian, a SaaS tool that scans public GitHub repositories for best-practice compliance and generates AI-powered reports with scores, rule results, and fix recommendations.
 
+## Mockup
+
+[View UI mockup on Figma](https://www.figma.com/design/D2RNdVVw2kd5raIAc33KD6/Untitled?node-id=10-21&t=9JzKq03bKWOgY64g-1)
+
 ## Prerequisites
 
 - Node.js 20+
