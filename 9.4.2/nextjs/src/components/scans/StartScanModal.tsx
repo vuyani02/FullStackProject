@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, Divider, Input, Modal, Select, Typography } from 'antd'
 import { RadarChartOutlined } from '@ant-design/icons'
 import axios from 'axios'
@@ -10,7 +10,6 @@ import { useStyles } from './styles/StartScanModal.style'
 
 const { Text } = Typography
 
-
 const StartScanModal = ({ open, onClose, onScanComplete, onScanStart, onScanEnd }: StartScanModalProps) => {
   const { styles } = useStyles()
   const { repositories } = useRepositoryState()
@@ -18,8 +17,25 @@ const StartScanModal = ({ open, onClose, onScanComplete, onScanStart, onScanEnd 
 
   const [selectedRepoId, setSelectedRepoId] = useState<string | undefined>(undefined)
   const [newUrl, setNewUrl] = useState('')
+  const [branch, setBranch] = useState('')
+  const [branches, setBranches] = useState<string[]>([])
+  const [isBranchLoading, setIsBranchLoading] = useState(false)
   const [isScanning, setIsScanning] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Fetch branches whenever an existing repo is selected
+  useEffect(() => {
+    if (!selectedRepoId) { setBranches([]); setBranch(''); return }
+    setIsBranchLoading(true)
+    axios.get(`/api/repositories/${selectedRepoId}/branches`)
+      .then((res) => {
+        const list: string[] = res.data ?? []
+        setBranches(list)
+        setBranch(list[0] ?? '')
+      })
+      .catch(() => setBranches([]))
+      .finally(() => setIsBranchLoading(false))
+  }, [selectedRepoId])
 
   const handleOpen = () => {
     if (!repositories) getRepositories()
@@ -28,6 +44,8 @@ const StartScanModal = ({ open, onClose, onScanComplete, onScanStart, onScanEnd 
   const handleClose = () => {
     setSelectedRepoId(undefined)
     setNewUrl('')
+    setBranch('')
+    setBranches([])
     setError(null)
     onClose()
   }
@@ -50,7 +68,10 @@ const StartScanModal = ({ open, onClose, onScanComplete, onScanStart, onScanEnd 
         repositoryId = addRes.data.id
       }
 
-      const scanRes = await axios.post('/api/repositories/scan', { repositoryId })
+      const scanRes = await axios.post('/api/repositories/scan', {
+        repositoryId,
+        branch: branch.trim() || null,
+      })
       handleClose()
       onScanComplete(scanRes.data)
     } catch {
@@ -103,6 +124,22 @@ const StartScanModal = ({ open, onClose, onScanComplete, onScanStart, onScanEnd 
         disabled={isScanning}
       />
 
+      {selectedRepoId && (
+        <>
+          <label htmlFor="scan-branch-select" className={styles.label} style={{ marginTop: 12 }}>Branch</label>
+          <Select
+            id="scan-branch-select"
+            placeholder="Choose a branch…"
+            options={branches.map((b) => ({ label: b, value: b }))}
+            value={branch || undefined}
+            onChange={setBranch}
+            loading={isBranchLoading}
+            style={{ width: '100%' }}
+            disabled={isScanning || isBranchLoading}
+          />
+        </>
+      )}
+
       <Divider className={styles.divider}>or</Divider>
 
       <label htmlFor="scan-github-url" className={styles.label}>Enter a new GitHub URL</label>
@@ -113,6 +150,19 @@ const StartScanModal = ({ open, onClose, onScanComplete, onScanStart, onScanEnd 
         onChange={(e) => { setNewUrl(e.target.value); setSelectedRepoId(undefined) }}
         disabled={isScanning}
       />
+
+      {newUrl.trim() && (
+        <>
+          <label htmlFor="scan-new-branch" className={styles.label} style={{ marginTop: 12 }}>Branch (optional)</label>
+          <Input
+            id="scan-new-branch"
+            placeholder="Leave blank to use the default branch"
+            value={branch}
+            onChange={(e) => setBranch(e.target.value)}
+            disabled={isScanning}
+          />
+        </>
+      )}
 
       {error && <Text className={styles.errorText}>{error}</Text>}
     </Modal>
