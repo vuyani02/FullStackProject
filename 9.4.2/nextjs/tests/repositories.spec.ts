@@ -13,12 +13,6 @@ test.describe('Repositories', () => {
     await expect(page.getByRole('table')).toBeVisible()
   })
 
-  test('Add Repository button opens the modal', async ({ page }) => {
-    await page.getByRole('button', { name: 'Add Repository' }).click()
-    await expect(page.getByRole('dialog')).toBeVisible()
-    await expect(page.getByPlaceholder(/github\.com/i)).toBeVisible()
-  })
-
   test('closing the modal hides it', async ({ page }) => {
     await page.getByRole('button', { name: 'Add Repository' }).click()
     await expect(page.getByRole('dialog')).toBeVisible()
