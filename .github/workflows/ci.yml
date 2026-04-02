@@ -13,6 +13,7 @@ jobs:
 
     env:
       API_URL: http://localhost:44311
+      SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
       TEST_TEAM_NAME: ${{ secrets.TEST_TEAM_NAME }}
       TEST_USERNAME: ${{ secrets.TEST_USERNAME }}
       TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
