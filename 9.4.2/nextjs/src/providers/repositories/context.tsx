@@ -16,7 +16,7 @@ export interface IRepositoryStateContext {
 export interface IRepositoryActionContext {
   getRepositories: () => void
   addRepository: (githubUrl: string) => void
-  startScan: (repositoryId: string) => void
+  startScan: (repositoryId: string, branch: string) => void
   clearScanResult: () => void
 }
 

@@ -33,9 +33,9 @@ export const RepositoryProvider = ({ children }: { children: React.ReactNode }) 
     }
   }
 
-  const startScan = async (repositoryId: string) => {
+  const startScan = async (repositoryId: string, branch: string) => {
     dispatch(startScanPending(repositoryId))
-    await axios.post('/api/repositories/scan', { repositoryId })
+    await axios.post('/api/repositories/scan', { repositoryId, branch })
       .then((res) => dispatch(startScanSuccess(res.data)))
       .catch(() => dispatch(startScanError()))
   }

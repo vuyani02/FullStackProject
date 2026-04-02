@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useRepositoryActions, useRepositoryState } from '@/providers/repositories'
 import { IRepository } from '@/Types/Repository/Types'
 import { useStyles } from './styles/RepositoryTable.style'
+import BranchScanModal from './BranchScanModal'
 
 const { Link } = Typography
 
@@ -17,6 +18,7 @@ const RepositoryTable = () => {
   const { startScan } = useRepositoryActions()
 
   const [search, setSearch] = useState('')
+  const [branchModalRepoId, setBranchModalRepoId] = useState<string | null>(null)
 
   const filtered = (repositories ?? []).filter((r) => {
     const q = search.toLowerCase()
@@ -63,7 +65,7 @@ const RepositoryTable = () => {
           size="small"
           icon={<RadarChartOutlined spin={isScanPending && scanningRepositoryId === row.id} />}
           disabled={isScanPending && scanningRepositoryId !== row.id}
-          onClick={(e) => { e.stopPropagation(); startScan(row.id) }}
+          onClick={(e) => { e.stopPropagation(); setBranchModalRepoId(row.id) }}
           className={styles.scanBtn}
         >
           Scan
@@ -74,6 +76,15 @@ const RepositoryTable = () => {
 
   return (
     <>
+      <BranchScanModal
+        open={branchModalRepoId !== null}
+        repositoryId={branchModalRepoId ?? ''}
+        onCancel={() => setBranchModalRepoId(null)}
+        onConfirm={(branch) => {
+          startScan(branchModalRepoId!, branch)
+          setBranchModalRepoId(null)
+        }}
+      />
       <div className={styles.toolbar}>
         <Input.Search
           placeholder="Search by name or owner…"
