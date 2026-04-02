@@ -54,15 +54,6 @@ export default defineConfig({
       testIgnore: /auth\.setup\.ts/,
     },
     {
-      name: 'firefox',
-      use: {
-        ...devices['Desktop Firefox'],
-        storageState: STORAGE_STATE,
-      },
-      dependencies: ['setup'],
-      testIgnore: /auth\.setup\.ts/,
-    },
-    {
       name: 'webkit',
       use: {
         ...devices['Desktop Safari'],
